@@ -94,18 +94,30 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
 
+  // === PLANILHA DE EMERGÊNCIA (DIA DO EVENTO) ===
   const exportarPlanilha = () => {
-    const headers = ["Nome Completo", "WhatsApp", "CPF", "Contato de Emergência", "Status", "Data da Compra"];
-    const csvRows = adminData.map(p => {
-      const dataHora = p.created_at ? new Date(p.created_at).toLocaleString('pt-BR') : 'N/A';
-      return [ `"${p.nome}"`, `"${p.telefone}"`, `"${p.cpf || 'Não informado'}"`, `"${p.contato_emergencia || 'Não informado'}"`, p.pago ? '"PAGO"' : '"PENDENTE"', `"${dataHora}"` ].join(';'); 
+    // 1. Filtra para pegar APENAS quem já está PAGO
+    const pessoasConfirmadas = adminData.filter(p => p.pago === true);
+
+    // 2. Define apenas as duas colunas solicitadas
+    const headers = ["Nome Completo", "Contato de Emergência"];
+    
+    // 3. Monta as linhas apenas com Nome e Contato SOS
+    const csvRows = pessoasConfirmadas.map(p => {
+      return [ 
+        `"${p.nome}"`, 
+        `"${p.contato_emergencia || 'Não informado'}"` 
+      ].join(';'); 
     });
+    
     const csvContent = [headers.join(';'), ...csvRows].join('\n');
     const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `Lista_Invasores_Trilha_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
+    
+    // 4. Nome do arquivo atualizado para o dia da trilha
+    link.setAttribute("download", `Lista_Emergencia_Trilha_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -189,8 +201,9 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
                 className="bg-transparent border-none outline-none text-base md:text-lg font-bold text-white w-full placeholder:text-zinc-600 focus:ring-0"
               />
             </div>
+            {/* O BOTÃO AGORA SÓ BAIXA A LISTA VIP DE EMERGÊNCIA */}
             <button onClick={exportarPlanilha} className="w-full md:w-auto bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 px-6 py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all border border-emerald-500/30">
-              <Download size={18} /> Baixar Excel
+              <Download size={18} /> Baixar Lista SOS
             </button>
           </div>
 
@@ -253,7 +266,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
                           </>
                         )}
 
-                        {/* NOVO BOTÃO: CHAMAR NO WHATSAPP */}
+                        {/* BOTÃO: CHAMAR NO WHATSAPP */}
                         <button 
                           onClick={() => chamarNoWhatsApp(p.telefone, p.nome)}
                           className="bg-zinc-800 hover:bg-[#25D366] hover:text-white text-zinc-400 p-2 rounded-full transition-colors border border-zinc-700 hover:border-[#25D366] group-hover:opacity-100 opacity-60 flex items-center justify-center ml-2"

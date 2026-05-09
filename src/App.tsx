@@ -307,7 +307,7 @@ const Trilha3Reinos = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
         </div>
         <div className="container mx-auto px-6 pb-12 relative z-10">
-          <span className="text-emerald-500 font-black uppercase tracking-[0.3em] text-[10px]">Invasores Apresenta</span>
+          <span className="text-emerald-500 font-black uppercase tracking-[0.3em] text-[10px]">Vem Para Trilha Apresenta</span>
           <h1 className="text-4xl md:text-7xl font-black italic tracking-tighter mt-1 uppercase leading-none">Trilha <br/> <span className="text-emerald-500"> 3 Reinos</span></h1>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-8">
             <a href="#inscricao" onClick={scrollToForm} className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-black py-3 px-8 rounded-xl shadow-lg transition-all uppercase tracking-widest text-[10px]">
@@ -324,7 +324,7 @@ const Trilha3Reinos = () => {
               <h2 className="text-2xl font-black uppercase italic mb-6 border-b border-zinc-900 pb-2 text-zinc-500">Descrição do evento</h2>
               <div className="space-y-6 text-zinc-400 text-lg leading-relaxed">
                 <p className="text-white font-bold italic">Trilha Santuário Dos três reinos</p>
-                <p>O grupo <span className="text-white font-bold text-emerald-500">Invasores</span> convida você para uma manhã de imersão total na natureza, explorando as belas paisagens da região.</p>
+                <p>A equipe <span className="text-white font-bold text-emerald-500">Vem Para Trilha</span> convida você para uma manhã de imersão total na natureza, explorando as belas paisagens da região.</p>
                 <p>Esta é a oportunidade perfeita para sair da rotina, respirar ar puro e se reconectar. Nossa trilha foi planejada para proporcionar uma experiência energizante, e como recompensa, um refrescante banho de rio para lavar a alma e renovar as energias.</p>
               </div>
               <div className="mt-10">
@@ -342,7 +342,7 @@ const Trilha3Reinos = () => {
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="col-span-full"><h2 className="text-2xl font-black uppercase italic mb-6 border-b border-zinc-900 pb-2 text-zinc-500">Sobre o evento</h2></div>
-              <InfoRow icon={<Calendar />} title="Data" text="22 de Março de 2026" />
+              <InfoRow icon={<Calendar />} title="Data" text="14 de Junho de 2026" />
               <InfoRow icon={<Clock />} title="Horário" text="07:00 às 12:00" />
               <a href="https://www.google.com/maps/place/?q=place_id:ChIJ4-tYpb8RqwcRxSQFPEP7it4" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><InfoRow icon={<MapPin className="text-emerald-500" />} title="Localização" text="Guabiraba, Recife - PE" /></a>
               <InfoRow icon={<Trophy />} title="Investimento" text={`R$ ${valorIngresso},00 por pessoa`} />
@@ -548,7 +548,7 @@ const Trilha3Reinos = () => {
                                 <div className="grid grid-cols-2 gap-4 bg-zinc-950/50 p-4 rounded-2xl border border-zinc-800/50">
                                   <div>
                                     <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest mb-1 flex items-center gap-1"><Calendar size={10}/> Data</p>
-                                    <p className="text-zinc-200 font-bold text-sm">22 Mar 2026</p>
+                                    <p className="text-zinc-200 font-bold text-sm">14 jun 2026</p>
                                   </div>
                                   <div>
                                     <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest mb-1 flex items-center gap-1"><Clock size={10}/> Partida</p>

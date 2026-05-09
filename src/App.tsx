@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Calendar, MapPin, Trophy, ChevronRight, Clock, Ticket, 
-  AlertTriangle, Mountain, Droplets, Coffee, Loader2, 
+  Mountain, Droplets, Coffee, Loader2,
   AlertCircle, ShieldCheck, Plus, Trash2, Waves, Info, 
   VolumeX, Copy, QrCode, CheckCircle, X, Maximize2, 
   Instagram, Users, ArrowRight, Lock, ArrowLeft, Hourglass
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Admin from './Admin'; 
+import Admin from './Admin';
 
 const Trilha3Reinos = () => {
   const [currentImg, setCurrentImg] = useState(0);
@@ -35,7 +35,7 @@ const Trilha3Reinos = () => {
   // === LINKS ATUALIZADOS ===
   const linkGrupoGeral = "https://chat.whatsapp.com/H5DWJOz0wcC2PntYSq1t8y"; 
   const linkInstagram = "https://www.instagram.com/vem_para_trilha?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="; 
-  const linkSuporte = "https://wa.me/5581994350798?text=Olá,%20preciso%20de%20ajuda%20com%20meu%20ingresso.";
+   
   
   const valorIngresso = 50; 
   const taxaPix = 0.50; 
@@ -76,12 +76,12 @@ const Trilha3Reinos = () => {
     }
   }, []);
 
-  const comprarMaisIngressos = () => {
-    setParticipants([{ name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '' }]);
-    setPaymentId(null);
-    setStatusPagamento('pendente');
-    setTelaAtual('formulario');
-  };
+ const comprarMaisIngressos = () => {
+  setParticipants([{ name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '' }]);
+  setPaymentId(null);
+  setStatusPagamento('pendente');
+  setTelaAtual('formulario');
+};
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

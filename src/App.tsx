@@ -245,16 +245,19 @@ const Trilha3Reinos = () => {
         }
       }
     }
-
-    if (!termsAccepted) { setErrorMsg("Aceite o termo de responsabilidade e regras de cancelamento."); return; }
+if (!termsAccepted) { 
+      setErrorMsg("Aceite o termo de responsabilidade e regras de cancelamento."); 
+      return; 
+    }
 
     setLoading(true);
     setErrorMsg('');
+    setStatusPagamento('pendente');
 
     try {
       const mainEmergency = `${participants[0].emergencyName} - ${participants[0].emergencyPhone}`;
       const mainEmail = participants[0].email;
-      const valorTotal = Number((calcularValorIngressos(participants.length) + taxaPix).toFixed(2)); 
+      const valorTotal = Number((calcularValorIngressos(participants.length) + taxaPix).toFixed(2));
 
       const response = await fetch('/api/gerar-pix', {
         method: 'POST',

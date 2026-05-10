@@ -71,7 +71,6 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
       });
 
       if (res.ok) {
-        // Tira o participante da tela na mesma hora
         setAdminData(prevData => prevData.filter(item => item.id !== id));
       } else {
         throw new Error("Acesso negado");
@@ -84,18 +83,16 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     }
   };
 
-  // === FUNÇÃO PARA CHAMAR NO WHATSAPP (ATUALIZADA PARA PENDENTES/PAGOS) ===
+  // === FUNÇÃO PARA CHAMAR NO WHATSAPP ===
   const chamarNoWhatsApp = (telefone: string, nome: string, pago: boolean) => {
-    let numeroFormatado = telefone.replace(/\D/g, ''); // Tira traços e parênteses
+    let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     
-    // Adiciona o código do Brasil (55) se a pessoa não tiver digitado
     if (numeroFormatado.length === 10 || numeroFormatado.length === 11) {
       numeroFormatado = '55' + numeroFormatado;
     }
 
-    const primeiroNome = nome.split(' ')[0]; // Pega só o primeiro nome pra ser mais amigável
+    const primeiroNome = (nome || '').split(' ')[0]; 
     
-    // Mensagem dinâmica dependendo do status de pagamento
     const mensagem = pago 
       ? encodeURIComponent(`Fala ${primeiroNome}! Aqui é da organização da Trilha 3 Reinos. Vi que sua inscrição está confirmada. Você conseguiu entrar no nosso grupo oficial do WhatsApp?`)
       : encodeURIComponent(`Fala ${primeiroNome}! Aqui é da organização da Trilha 3 Reinos. Vi que você iniciou sua inscrição, mas o pagamento ainda não constou pra gente. Precisa de alguma ajuda com o PIX?`);
@@ -103,18 +100,14 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
 
-  // === PLANILHA DE EMERGÊNCIA (DIA DO EVENTO) ===
+  // === PLANILHA DE EMERGÊNCIA ===
   const exportarPlanilha = () => {
-    // 1. Filtra para pegar APENAS quem já está PAGO
     const pessoasConfirmadas = adminData.filter(p => p.pago === true);
-
-    // 2. Define apenas as duas colunas solicitadas
     const headers = ["Nome Completo", "Contato de Emergência"];
     
-    // 3. Monta as linhas apenas com Nome e Contato SOS
     const csvRows = pessoasConfirmadas.map(p => {
       return [ 
-        `"${p.nome}"`, 
+        `"${p.nome || ''}"`, 
         `"${p.contato_emergencia || 'Não informado'}"` 
       ].join(';'); 
     });
@@ -124,22 +117,21 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    
-    // 4. Nome do arquivo atualizado para o dia da trilha
     link.setAttribute("download", `Lista_Emergencia_Trilha_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  // === CÁLCULOS ATUALIZADOS ===
+  // === CÁLCULOS ===
   const totalPagos = adminData.filter(p => p.pago).length;
   const totalPendentes = adminData.length - totalPagos;
-  const arrecadado = totalPagos * 50; // Atualizado para o valor correto de R$ 50
+  const arrecadado = totalPagos * 50; 
 
+  // === TRAVA DE SEGURANÇA NA BUSCA (Correção aplicada aqui) ===
   const dadosFiltrados = adminData.filter(p => 
-    p.nome.toLowerCase().includes(busca.toLowerCase()) || 
-    p.telefone.includes(busca)
+    (p.nome || '').toLowerCase().includes(busca.toLowerCase()) || 
+    (p.telefone || '').includes(busca)
   );
 
   if (loading) return (
@@ -172,7 +164,6 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
           </button>
         </div>
 
-        {/* CARDS DE ESTATÍSTICAS ATUALIZADOS PARA 4 COLUNAS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-gradient-to-br from-zinc-900/90 to-zinc-900/50 backdrop-blur-md p-6 rounded-[2rem] border border-zinc-800/50 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
@@ -240,7 +231,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
                 {dadosFiltrados.map((p, i) => (
                   <tr key={i} className="hover:bg-zinc-800/30 transition-all duration-300 group">
                     <td className="p-6">
-                      <div className="font-black text-white text-base tracking-tight mb-1 group-hover:text-emerald-400 transition-colors">{p.nome}</div>
+                      <div className="font-black text-white text-base tracking-tight mb-1 group-hover:text-emerald-400 transition-colors">{p.nome || 'N/A'}</div>
                       <div className="flex flex-col gap-2 items-start">
                         <span className="text-[10px] bg-zinc-950 text-zinc-500 px-2 py-1 rounded font-mono uppercase border border-zinc-800">
                           {p.cpf ? `CPF: ${p.cpf}` : 'CPF Pendente'}
@@ -255,7 +246,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
                       </div>
                     </td>
                     <td className="p-6">
-                      <div className="font-bold text-zinc-300 mb-1">{p.telefone}</div>
+                      <div className="font-bold text-zinc-300 mb-1">{p.telefone || 'N/A'}</div>
                       <div className="text-[10px] text-zinc-500 uppercase font-bold flex items-center gap-1">
                         <span className="w-1.5 h-1.5 bg-red-500 rounded-full inline-block"></span> 
                         SOS: <span className="text-zinc-400">{p.contato_emergencia || 'N/A'}</span>
@@ -278,7 +269,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
                         )}
 
                         <div className="flex gap-2 ml-2">
-                          {/* BOTÃO APROVAR MANUAL (SÓ APARECE SE NÃO ESTIVER PAGO) */}
+                          {/* BOTÃO APROVAR MANUAL */}
                           {!p.pago && (
                             <button 
                               onClick={() => aprovarPagamentoManual(p.id)}

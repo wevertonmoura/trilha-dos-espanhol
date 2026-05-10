@@ -9,6 +9,28 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import Admin from './Admin';
 
+// === FUNÇÃO DE VALIDAÇÃO MATEMÁTICA DE CPF ===
+const validarCPF = (cpf: string) => {
+  if (!cpf) return false;
+  const strCPF = cpf.replace(/\D/g, ''); // Tira os pontos e traços
+  
+  if (strCPF.length !== 11 || /^(\d)\1{10}$/.test(strCPF)) return false; // Verifica se tem 11 dígitos ou se são repetidos
+  
+  let soma = 0;
+  for (let i = 1; i <= 9; i++) soma += parseInt(strCPF.substring(i - 1, i)) * (11 - i);
+  let resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(strCPF.substring(9, 10))) return false;
+  
+  soma = 0;
+  for (let i = 1; i <= 10; i++) soma += parseInt(strCPF.substring(i - 1, i)) * (12 - i);
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(strCPF.substring(10, 11))) return false;
+  
+  return true;
+};
+
 const Trilha3Reinos = () => {
   const [currentImg, setCurrentImg] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -194,14 +216,30 @@ const Trilha3Reinos = () => {
       return;
     }
 
+    // === VALIDAÇÕES ADAPTADAS (Apenas o Titular precisa de CPF/Phone) ===
     for (let i = 0; i < participants.length; i++) {
       const p = participants[i];
-      if (p.name.trim().length < 3) { setErrorMsg(`Preencha o nome do Participante ${i + 1}.`); return; }
-      if (p.phone.replace(/\D/g, '').length < 10) { setErrorMsg(`WhatsApp incompleto no Participante ${i + 1}.`); return; }
-      if (p.cpf.replace(/\D/g, '').length < 11) { setErrorMsg(`CPF incompleto no Participante ${i + 1}.`); return; }
+      
+      // Valida Nome para TODOS
+      if (p.name.trim().length < 3) { 
+        setErrorMsg(i === 0 ? `Preencha o nome do Titular.` : `Preencha o nome do Acompanhante ${i}.`); 
+        return; 
+      }
+      
+      // Valida Dados Sensíveis APENAS PARA O TITULAR (index 0)
       if (i === 0) {
+        if (p.phone.replace(/\D/g, '').length < 10) { 
+          setErrorMsg(`WhatsApp incompleto no Titular.`); return; 
+        }
+        
+        // Validação Matemática do CPF do Titular
+        if (!validarCPF(p.cpf)) { 
+          setErrorMsg(`⚠️ CPF Inválido! Verifique o número digitado pelo Titular.`); return; 
+        }
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(p.email)) { setErrorMsg("Digite um e-mail válido."); return; }
+        
         if (p.emergencyName.trim().length < 2 || p.emergencyPhone.replace(/\D/g, '').length < 10) { 
           setErrorMsg("Preencha corretamente os dados de Emergência (SOS)."); return; 
         }
@@ -446,28 +484,42 @@ const Trilha3Reinos = () => {
                   )}
 
                   <form onSubmit={handleSubmit} className="space-y-8">
+                    
+                    {/* === FORMULÁRIO DINÂMICO PARA TITULAR E ACOMPANHANTES === */}
                     {participants.map((participant, index) => (
-                      <div key={index} className="p-6 rounded-3xl bg-zinc-800/40 border border-zinc-700/50 relative shadow-inner">
-                        {index > 0 && (
-                          <div className="flex justify-between items-center mb-6">
-                            <button type="button" onClick={() => removeParticipant(index)} className="text-zinc-500 hover:text-red-500 transition-colors p-1"><Trash2 size={18} /></button>
-                          </div>
-                        )}
+                      <div key={index} className="p-6 rounded-3xl bg-zinc-800/40 border border-zinc-700/50 relative shadow-inner overflow-hidden">
+                        
+                        {/* Etiqueta colorida no canto para separar Titular de Acompanhante */}
+                        <div className={`absolute top-0 left-0 w-1.5 h-full ${index === 0 ? 'bg-emerald-500' : 'bg-zinc-600'}`}></div>
+
+                        <div className="flex justify-between items-center mb-4 pl-2 border-b border-zinc-700/50 pb-2">
+                          <h3 className={`text-[10px] font-black uppercase tracking-widest ${index === 0 ? 'text-emerald-500' : 'text-zinc-400'}`}>
+                            {index === 0 ? "👤 Titular da Inscrição (Responsável)" : `👥 Acompanhante ${index}`}
+                          </h3>
+                          {index > 0 && (
+                            <button type="button" onClick={() => removeParticipant(index)} className="text-zinc-500 hover:text-red-500 transition-colors p-1" title="Remover Acompanhante"><Trash2 size={16} /></button>
+                          )}
+                        </div>
+
                         <div className="grid grid-cols-1 gap-5">
                           <div className="space-y-1">
                             <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">Nome Completo</label>
                             <input type="text" value={participant.name} onChange={e => updateParticipant(index, 'name', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="Ex: João Silva" />
                           </div>
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">WhatsApp</label>
-                            <input type="tel" value={participant.phone} onChange={e => updateParticipant(index, 'phone', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="(81) 99999-9999" />
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">CPF</label>
-                            <input type="text" required value={participant.cpf} onChange={e => updateParticipant(index, 'cpf', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="000.000.000-00" />
-                          </div>
+
+                          {/* DADOS SENSÍVEIS (WHATSAPP, CPF, EMAIL E EMERGÊNCIA) SÓ PARA O TITULAR */}
                           {index === 0 && (
                             <>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">WhatsApp</label>
+                                  <input type="tel" value={participant.phone} onChange={e => updateParticipant(index, 'phone', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="(81) 99999-9999" />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">CPF (Necessário para a compra)</label>
+                                  <input type="text" required value={participant.cpf} onChange={e => updateParticipant(index, 'cpf', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="000.000.000-00" />
+                                </div>
+                              </div>
                               <div className="space-y-1">
                                 <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">E-mail</label>
                                 <input type="email" value={participant.email} onChange={e => updateParticipant(index, 'email', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="seu@gmail.com" />
@@ -487,10 +539,9 @@ const Trilha3Reinos = () => {
                     ))}
                     
                     {vagasOcupadas + participants.length < LIMITE_VAGAS && (
-                       <button type="button" onClick={addParticipant} className="w-full py-4 border-2 border-dashed border-zinc-600 rounded-2xl text-zinc-400 font-bold hover:border-emerald-500 hover:text-emerald-500 transition-all flex items-center justify-center gap-2 uppercase text-[10px] tracking-widest"><Plus size={16} /> Comprar outro ingresso</button>
+                       <button type="button" onClick={addParticipant} className="w-full py-4 border-2 border-dashed border-zinc-600 rounded-2xl text-zinc-400 font-bold hover:border-emerald-500 hover:text-emerald-500 transition-all flex items-center justify-center gap-2 uppercase text-[10px] tracking-widest"><Plus size={16} /> Comprar Ingresso Extra (Acompanhante)</button>
                     )}
 
-                    {/* MUDANÇA: Checkbox englobado no <label> para aumentar área de clique */}
                     <label className="flex items-start gap-3 pt-6 border-t border-zinc-700/50 cursor-pointer group">
                       <input type="checkbox" checked={termsAccepted} onChange={e => setTermsAccepted(e.target.checked)} className="mt-1 h-5 w-5 accent-emerald-500 cursor-pointer rounded shrink-0 group-hover:ring-2 ring-emerald-500/50 transition-all" />
                       <span className="text-[11px] text-zinc-400 font-bold leading-relaxed select-none group-hover:text-zinc-300 transition-colors">
@@ -498,9 +549,10 @@ const Trilha3Reinos = () => {
                       </span>
                     </label>
 
-                    {errorMsg && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-[10px] font-bold flex items-center gap-2"><AlertCircle size={14}/> {errorMsg}</div>}
+                    {errorMsg && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-[10px] font-bold flex items-center justify-center gap-2"><AlertCircle size={14}/> {errorMsg}</div>}
+                    
                     <button disabled={loading} className="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-black py-5 rounded-2xl shadow-xl transition-all uppercase tracking-widest flex items-center justify-center gap-3 text-sm mt-4">
-                      {loading ? <Loader2 className="animate-spin" /> : <>Finalizar (R$ {formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)}) <ChevronRight size={20} /></>}
+                      {loading ? <Loader2 className="animate-spin" /> : <>Finalizar Inscrição (R$ {formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)}) <ChevronRight size={20} /></>}
                     </button>
                   </form>
                 </>
@@ -541,7 +593,9 @@ const Trilha3Reinos = () => {
                               <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none"><Mountain size={140} /></div>
                               <div className="space-y-6 relative z-10">
                                 <div>
-                                  <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-[0.2em] mb-1">Titular</p>
+                                  <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-[0.2em] mb-1">
+                                    {index === 0 ? "Titular da Compra" : "Acompanhante"}
+                                  </p>
                                   <p className="text-white font-black text-xl uppercase tracking-tight truncate">{p.name}</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 bg-zinc-950/50 p-4 rounded-2xl border border-zinc-800/50">

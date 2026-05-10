@@ -12,9 +12,9 @@ import Admin from './Admin';
 // === FUNÇÃO DE VALIDAÇÃO MATEMÁTICA DE CPF ===
 const validarCPF = (cpf: string) => {
   if (!cpf) return false;
-  const strCPF = cpf.replace(/\D/g, ''); // Tira os pontos e traços
+  const strCPF = cpf.replace(/\D/g, ''); 
   
-  if (strCPF.length !== 11 || /^(\d)\1{10}$/.test(strCPF)) return false; // Verifica se tem 11 dígitos ou se são repetidos
+  if (strCPF.length !== 11 || /^(\d)\1{10}$/.test(strCPF)) return false; 
   
   let soma = 0;
   for (let i = 1; i <= 9; i++) soma += parseInt(strCPF.substring(i - 1, i)) * (11 - i);
@@ -44,7 +44,6 @@ const Trilha3Reinos = () => {
 
   const [senhaAdmin, setSenhaAdmin] = useState('');
   const [erroLoginAdmin, setErroLoginAdmin] = useState('');
-  const [meusIngressos, setMeusIngressos] = useState<any[]>([]);
 
   // === SISTEMA DE TRAVA E LISTA DE ESPERA ===
   const LIMITE_VAGAS = 60;
@@ -93,13 +92,6 @@ const Trilha3Reinos = () => {
       }
     };
     fetchVagas();
-
-    const carteiraSalva = localStorage.getItem('@trilha:carteira');
-    if (carteiraSalva) {
-      setMeusIngressos(JSON.parse(carteiraSalva));
-      setTelaAtual('pix');
-      setStatusPagamento('pago');
-    }
   }, []);
 
   useEffect(() => {
@@ -142,6 +134,7 @@ const Trilha3Reinos = () => {
     return `${m}:${s}`;
   };
 
+  // === CHECAGEM DE PAGAMENTO (POLLING) ===
   useEffect(() => {
     let intervalo: any;
     if (paymentId && statusPagamento === 'pendente' && telaAtual === 'pix') {
@@ -151,18 +144,13 @@ const Trilha3Reinos = () => {
           const data = await res.json();
           if (data.status === 'approved') {
             setStatusPagamento('pago');
-            setMeusIngressos(prev => {
-              const novaCarteira = [...prev, ...participants];
-              localStorage.setItem('@trilha:carteira', JSON.stringify(novaCarteira));
-              return novaCarteira;
-            });
             clearInterval(intervalo);
           }
         } catch (err) { console.error(err); }
       }, 3000);
     }
     return () => clearInterval(intervalo);
-  }, [paymentId, statusPagamento, telaAtual, participants]);
+  }, [paymentId, statusPagamento, telaAtual]);
 
   const removeParticipant = (index: number) => {
     const newParticipants = [...participants];
@@ -216,23 +204,19 @@ const Trilha3Reinos = () => {
       return;
     }
 
-    // === VALIDAÇÕES ADAPTADAS (Apenas o Titular precisa de CPF/Phone) ===
+    // === VALIDAÇÕES ADAPTADAS ===
     for (let i = 0; i < participants.length; i++) {
       const p = participants[i];
       
-      // Valida Nome para TODOS
       if (p.name.trim().length < 3) { 
         setErrorMsg(i === 0 ? `Preencha o nome do Titular.` : `Preencha o nome do Acompanhante ${i}.`); 
         return; 
       }
       
-      // Valida Dados Sensíveis APENAS PARA O TITULAR (index 0)
       if (i === 0) {
         if (p.phone.replace(/\D/g, '').length < 10) { 
           setErrorMsg(`WhatsApp incompleto no Titular.`); return; 
         }
-        
-        // Validação Matemática do CPF do Titular
         if (!validarCPF(p.cpf)) { 
           setErrorMsg(`⚠️ CPF Inválido! Verifique o número digitado pelo Titular.`); return; 
         }
@@ -245,7 +229,8 @@ const Trilha3Reinos = () => {
         }
       }
     }
-if (!termsAccepted) { 
+    
+    if (!termsAccepted) { 
       setErrorMsg("Aceite o termo de responsabilidade e regras de cancelamento."); 
       return; 
     }
@@ -294,6 +279,10 @@ if (!termsAccepted) {
     navigator.clipboard.writeText(qrCodePix);
     setCopiado(true);
     setTimeout(() => setCopiado(false), 3000); 
+  };
+
+  const reiniciarCompra = () => {
+    window.location.reload();
   };
 
   if (telaAtual === 'login_admin') {
@@ -430,7 +419,7 @@ if (!termsAccepted) {
               ) : 
               
               /* ESTADO 2: VAGAS ESGOTADAS -> LISTA DE ESPERA VIP */
-              vagasOcupadas >= LIMITE_VAGAS && telaAtual === 'formulario' && meusIngressos.length === 0 ? (
+              vagasOcupadas >= LIMITE_VAGAS && telaAtual === 'formulario' ? (
                 <div className="animate-in fade-in zoom-in duration-500">
                   <div className="text-center mb-8">
                     <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
@@ -480,12 +469,6 @@ if (!termsAccepted) {
                     <p className="text-emerald-500 text-sm font-bold mt-2 tracking-widest">R$ 50 INDIVIDUAL | R$ 90 VOCÊ + 1 AMIGO</p>
                   </div>
                   
-                  {meusIngressos.length > 0 && (
-                    <button onClick={() => { setTelaAtual('pix'); setStatusPagamento('pago'); }} className="w-full mb-8 bg-zinc-800/80 hover:bg-zinc-800 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl font-bold flex items-center justify-center gap-2 uppercase tracking-widest text-xs transition-all shadow-lg">
-                      <Ticket size={18} /> Ver meus {meusIngressos.length} Ingressos
-                    </button>
-                  )}
-
                   <form onSubmit={handleSubmit} className="space-y-8">
                     
                     {/* === FORMULÁRIO DINÂMICO PARA TITULAR E ACOMPANHANTES === */}
@@ -563,59 +546,38 @@ if (!termsAccepted) {
                 /* ESTADO 4: TELA DO PIX OU SUCESSO */
                 <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500">
                   {statusPagamento === 'pago' ? (
-                    <div className="py-2 space-y-6">
-                      <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(16,185,129,0.4)]">
-                        <CheckCircle size={32} className="text-white" />
+                    <div className="py-2 space-y-6 flex flex-col items-center">
+                      <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+                        <CheckCircle size={40} className="text-white" />
                       </div>
-                      <h2 className="text-2xl font-black uppercase italic text-white">Pagamento Confirmado!</h2>
-                      
-                      <div className="space-y-8 text-left w-full max-w-md mx-auto pb-4">
-                        {meusIngressos.map((p, index) => (
+                      <h2 className="text-3xl font-black uppercase italic text-white tracking-tighter">Pagamento <br /> Confirmado!</h2>
+                      <p className="text-zinc-400 font-bold text-sm max-w-xs mx-auto">
+                        O comprovante e os detalhes da sua inscrição foram enviados para o e-mail: <strong className="text-emerald-500">{participants[0].email}</strong>
+                      </p>
+
+                      {/* CARTÕES DA COMPRA ATUAL */}
+                      <div className="space-y-4 text-left w-full max-w-md mx-auto pt-4 pb-2">
+                        {participants.map((p, index) => (
                           <motion.div 
                             initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: index * 0.2 }} key={index} 
-                            className="relative bg-zinc-900 rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-zinc-800"
+                            className="bg-zinc-900/80 p-4 rounded-xl border border-emerald-500/20 flex items-center gap-4"
                           >
-                            <div className="bg-gradient-to-br from-emerald-600 to-emerald-900 p-6 relative overflow-hidden">
-                               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
-                               <div className="flex justify-between items-start relative z-10">
-                                 <div>
-                                   <p className="text-emerald-100 text-[10px] font-black uppercase tracking-[0.3em] mb-1">ingresso</p>
-                                   <h3 className="text-white text-2xl font-black italic tracking-tighter uppercase">Trilha 3 Reinos</h3>
-                                 </div>
-                                 <div className="bg-zinc-950/50 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
-                                   <span className="text-white font-mono text-xs font-bold">#{String(index + 1).padStart(3, '0')}</span>
-                                 </div>
-                               </div>
+                            <div className="bg-emerald-500/10 p-3 rounded-lg">
+                              <Ticket className="text-emerald-500" size={24} />
                             </div>
-                            <div className="relative h-8 bg-zinc-900 flex items-center">
-                              <div className="absolute -left-4 w-8 h-8 bg-zinc-950 rounded-full border-r border-zinc-800"></div>
-                              <div className="w-full border-t-2 border-dashed border-zinc-800/80 mx-6"></div>
-                              <div className="absolute -right-4 w-8 h-8 bg-zinc-950 rounded-full border-l border-zinc-800"></div>
-                            </div>
-                            <div className="p-6 pt-2 pb-8 bg-zinc-900 relative">
-                              <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none"><Mountain size={140} /></div>
-                              <div className="space-y-6 relative z-10">
-                                <div>
-                                  <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-[0.2em] mb-1">
-                                    {index === 0 ? "Titular da Compra" : "Acompanhante"}
-                                  </p>
-                                  <p className="text-white font-black text-xl uppercase tracking-tight truncate">{p.name}</p>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 bg-zinc-950/50 p-4 rounded-2xl border border-zinc-800/50">
-                                  <div>
-                                    <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest mb-1 flex items-center gap-1"><Calendar size={10}/> Data</p>
-                                    <p className="text-zinc-200 font-bold text-sm">14 jun 2026</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest mb-1 flex items-center gap-1"><Clock size={10}/> Partida</p>
-                                    <p className="text-zinc-200 font-bold text-sm">07:00 AM</p>
-                                  </div>
-                                </div>
-                              </div>
+                            <div>
+                              <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">
+                                {index === 0 ? "Titular" : "Acompanhante"}
+                              </p>
+                              <p className="text-white font-bold uppercase truncate">{p.name}</p>
                             </div>
                           </motion.div>
                         ))}
                       </div>
+
+                      <button onClick={reiniciarCompra} className="mt-8 px-6 py-3 border border-zinc-700 hover:border-emerald-500 rounded-xl text-zinc-400 hover:text-emerald-500 text-xs font-bold uppercase tracking-widest transition-all">
+                        Fazer Nova Inscrição
+                      </button>
                     </div>
                   ) : (
                     <>

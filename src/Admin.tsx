@@ -83,7 +83,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     }
   };
 
-  // === FUNÇÃO PARA CHAMAR NO WHATSAPP ===
+  // === MENSAGEM DO WHATSAPP ATUALIZADA ===
   const chamarNoWhatsApp = (telefone: string, nome: string, pago: boolean) => {
     let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     
@@ -93,9 +93,23 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
 
     const primeiroNome = (nome || '').split(' ')[0]; 
     
-    const mensagem = pago 
-      ? encodeURIComponent(`Fala ${primeiroNome}! Aqui é da organização da Trilha 3 Reinos. Vi que sua inscrição está confirmada. Você conseguiu entrar no nosso grupo oficial do WhatsApp?`)
-      : encodeURIComponent(`Fala ${primeiroNome}! Aqui é da organização da Trilha 3 Reinos. Vi que você iniciou sua inscrição, mas o pagamento ainda não constou pra gente. Precisa de alguma ajuda com o PIX?`);
+    // Procura se essa pessoa comprou para mais alguém (mesmo telefone, nome diferente)
+    const acompanhantes = adminData.filter(p => p.telefone === telefone && p.nome !== nome && p.pago === true);
+    const nomesAcompanhantes = acompanhantes.map(a => a.nome.split(' ')[0]).join(', ');
+    
+    // Monta o texto de confirmação
+    let textoConfirmado = `Fala ${primeiroNome}! Aqui é da organização da Vem Para Trilha. Passando para avisar que a sua compra foi CONFIRMADA com sucesso! ✅\n\nQueria te pedir um favor: manda aqui uma foto sua e o seu @ do Instagram para a gente ir conhecendo a galera.\n\n`;
+    
+    if (acompanhantes.length > 0) {
+      textoConfirmado += `Como você também garantiu a vaga do pessoal (${nomesAcompanhantes}), manda a foto e o @ deles aqui também, por favor!\n\n`;
+    }
+    
+    textoConfirmado += `Ah, só pra avisar: em breve vamos criar um grupo oficial no WhatsApp com toda a galera que vai participar da trilha para passar os últimos detalhes, beleza? Nos vemos lá! 🌿🏕️`;
+
+    // Se estiver pendente, manda mensagem de cobrança/ajuda
+    const textoPendente = `Fala ${primeiroNome}! Aqui é da organização da Vem Para Trilha. Vi que você iniciou sua inscrição, mas o pagamento ainda não constou pra gente. Precisa de alguma ajuda com o PIX?`;
+
+    const mensagem = pago ? encodeURIComponent(textoConfirmado) : encodeURIComponent(textoPendente);
     
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
@@ -128,7 +142,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
   const totalPendentes = adminData.length - totalPagos;
   const arrecadado = totalPagos * 50; 
 
-  // === TRAVA DE SEGURANÇA NA BUSCA (Correção aplicada aqui) ===
+  // === TRAVA DE SEGURANÇA NA BUSCA ===
   const dadosFiltrados = adminData.filter(p => 
     (p.nome || '').toLowerCase().includes(busca.toLowerCase()) || 
     (p.telefone || '').includes(busca)
@@ -156,7 +170,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
             </div>
             <div>
               <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">Comando Central</h1>
-              <p className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Invasores 081 • Edição Trilha</p>
+              <p className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Vem Para Trilha • Edição 3 Reinos</p>
             </div>
           </div>
           <button onClick={fecharAdmin} className="w-full md:w-auto bg-zinc-800/80 hover:bg-zinc-700 text-white px-6 py-4 rounded-xl flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest transition-all border border-zinc-700 shadow-lg group">
@@ -312,7 +326,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
                 <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800 text-zinc-700">
                   <Search size={24} />
                 </div>
-                <p className="text-zinc-500 font-black uppercase text-xs tracking-widest">Nenhum Invasor encontrado na busca</p>
+                <p className="text-zinc-500 font-black uppercase text-xs tracking-widest">Nenhum trilheiro encontrado na busca</p>
               </div>
             )}
           </div>

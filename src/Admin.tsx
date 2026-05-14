@@ -137,10 +137,14 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     document.body.removeChild(link);
   };
 
-  // === CÁLCULOS ===
+  // === CÁLCULOS (CORRIGIDO PARA REGRA DA CASADINHA) ===
   const totalPagos = adminData.filter(p => p.pago).length;
   const totalPendentes = adminData.length - totalPagos;
-  const arrecadado = totalPagos * 50; 
+  
+  // Nova lógica de agrupamento (R$ 90 o par e R$ 50 o avulso)
+  const pares = Math.floor(totalPagos / 2);
+  const avulsos = totalPagos % 2;
+  const arrecadado = (pares * 90) + (avulsos * 50); 
 
   // === TRAVA DE SEGURANÇA NA BUSCA ===
   const dadosFiltrados = adminData.filter(p => 

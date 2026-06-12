@@ -94,7 +94,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     const acompanhantes = adminData.filter(p => p.telefone === telefone && p.nome !== nome && p.pago === true);
     const nomesAcompanhantes = acompanhantes.map(a => a.nome.split(' ')[0]).join(', ');
     
-    let textoConfirmado = `Fala, ${primeiroNome}! Aqui é da organização do Vem Para Trilha.\n\nA nossa aventura na trilha do Santuário dos Três Reinos já é agora, no dia 14/06! 🌿⛰️\n\nPara ficar por dentro de tudo, venha para o nosso Grupo Oficial do WhatsApp. É exclusivamente por lá que vamos divulgar o nosso ponto de encontro e todas as instruções finais!\n\n⚠️ AVISO MUITO IMPORTANTE:\nFaremos uma chamada rigorosa pela lista de inscritos. Como o Santuário é uma propriedade privada com controle de acesso, não será permitida a entrada de penetras (pessoas sem inscrição) sob nenhuma hipótese. Por favor, não levem pessoas a mais para evitarmos constrangimentos no dia, beleza?\n\n👉 Clique no link abaixo e entre no grupo oficial:\nhttps://chat.whatsapp.com/EX5BV94TEvGDpaude0hl4v\n\n(Se você comprou o ingresso da Casadinha, mande esse link para o seu acompanhante entrar também!)\n\nBora simbora lavar a alma! Nos vemos lá! 💦🔥`;
+    let textoConfirmado = `Fala, ${primeiroNome}! Aqui é da organização do Vem Para Trilha.\n\nA nossa aventura na trilha do Santuário dos Três Reinos já é agora, no dia 14/06! 🌿⛰️\n\nPara ficar por dentro de tudo, venha para o nosso Grupo Oficial do WhatsApp. É exclusivamente por lá que vamos divulgar o nosso ponto de encontro e todas as instruções finais!\n\n⚠️ AVISO MUITO IMPORTANTE:\nFaremos uma chamada rigorosa pela lista de inscritos. Como o Santuário é uma propriedade privada com controle de acesso, não será permitida a entrada de penetras (pessoas sem inscrição) sob nenhuma hipótese. Por favor, não levem pessoas a mais para evitarmos constrangimentos no dia, beleza?\n\n👉 Clique no link abaixo e entre no grupo oficial:\n🔗 https://chat.whatsapp.com/EX5BV94TEvGDpaude0hl4v\n\n(Se você comprou o ingresso da Casadinha, mande esse link para o seu acompanhante entrar também!)\n\nBora simbora lavar a alma! Nos vemos lá! 💦🔥`;
 
     const textoPendente = `Fala ${primeiroNome}! Aqui é da organização do Vem Para Trilha. O dia da nossa trilha no Santuário dos Três Reinos tá chegando (14/06)! 🔥 Vi que você iniciou sua inscrição, mas o pagamento ainda não constou pra gente. Precisa de alguma ajuda com o PIX?`;
 
@@ -103,8 +103,8 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
 
+  // === PLANILHA DE EMERGÊNCIA (SOS) ===
   const exportarPlanilha = () => {
-    // Ordena alfabeticamente para o download
     const pessoasConfirmadas = adminData
       .filter(p => p.pago === true)
       .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
@@ -123,7 +123,35 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `Lista_Emergencia_Trilha_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
+    link.setAttribute("download", `Lista_Emergencia_Tres_Reinos_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // === PLANILHA COMPLETA COM DADOS ===
+  const exportarPlanilhaCompleta = () => {
+    const pessoasConfirmadas = adminData
+      .filter(p => p.pago === true)
+      .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
+      
+    const headers = ["Nome Completo", "WhatsApp", "CPF", "Contato de Emergência"];
+    
+    const csvRows = pessoasConfirmadas.map(p => {
+      return [ 
+        `"${p.nome || ''}"`, 
+        `"${p.telefone || ''}"`,
+        `"${p.cpf || ''}"`,
+        `"${p.contato_emergencia || 'Não informado'}"` 
+      ].join(';'); 
+    });
+    
+    const csvContent = [headers.join(';'), ...csvRows].join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Inscritos_Tres_Reinos_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -136,7 +164,6 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
   const avulsos = totalPagos % 2;
   const arrecadado = (pares * 90) + (avulsos * 50); 
 
-  // Ordena alfabeticamente para a visualização na tela
   const dadosFiltrados = adminData
     .filter(p => 
       (p.nome || '').toLowerCase().includes(busca.toLowerCase()) || 
@@ -166,7 +193,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
             </div>
             <div>
               <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">Comando Central</h1>
-              <p className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Vem Para Trilha • Cachoeira do Brennand</p>
+              <p className="text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Vem Para Trilha • Santuário dos Três Reinos</p>
             </div>
           </div>
           <button onClick={fecharAdmin} className="w-full md:w-auto bg-zinc-800/80 hover:bg-zinc-700 text-white px-6 py-4 rounded-xl flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest transition-all border border-zinc-700 shadow-lg group">
@@ -223,9 +250,15 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: any) => {
                 className="bg-transparent border-none outline-none text-base md:text-lg font-bold text-white w-full placeholder:text-zinc-600 focus:ring-0"
               />
             </div>
-            <button onClick={exportarPlanilha} className="w-full md:w-auto bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 px-6 py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all border border-emerald-500/30">
-              <Download size={18} /> Baixar Lista SOS
-            </button>
+            
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto mt-4 md:mt-0">
+              <button onClick={exportarPlanilha} className="w-full sm:w-auto bg-red-500/10 hover:bg-red-500/20 text-red-500 px-6 py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all border border-red-500/30">
+                <ShieldAlert size={18} /> Lista SOS
+              </button>
+              <button onClick={exportarPlanilhaCompleta} className="w-full sm:w-auto bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 px-6 py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all border border-emerald-500/30">
+                <Download size={18} /> Lista Completa
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">

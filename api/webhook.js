@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || 'https://revyeudqlndidaiprabc.supabase.co',
+  process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
 
@@ -40,12 +40,11 @@ export default async function handler(req, res) {
 
     if (mpData.status === 'approved') {
       const emailPrincipal = mpData.external_reference;
-      const idDoPagamentoString = paymentId.toString(); // ID que salvamos na nova coluna do banco
+      const idDoPagamentoString = paymentId.toString(); 
       
       console.log(`✅ Pagamento APROVADO para: ${emailPrincipal}`);
 
       if (idDoPagamentoString) {
-        // === MUDANÇA AQUI: Buscamos pelo payment_id em vez do e-mail ===
         const { data: inscricoes, error: erroBusca } = await supabase
           .from('inscricao_trilha')
           .select('*')
@@ -57,7 +56,6 @@ export default async function handler(req, res) {
             
             console.log(`📝 Atualizando ${inscricoes.length} inscritos deste pagamento...`);
 
-            // === MUDANÇA AQUI: Atualizamos apenas quem tem esse payment_id ===
             const { error: erroUpdate } = await supabase
               .from('inscricao_trilha')
               .update({ pago: true })
@@ -68,13 +66,12 @@ export default async function handler(req, res) {
             } else {
               console.log("🚀 Banco de dados atualizado com SUCESSO!");
               
-              // 3. Disparar E-mail de Confirmação
               const nomesParticipantes = inscricoes.map(p => `<li>🎟️ <strong>${p.nome}</strong></li>`).join('');
 
               const mailOptions = {
                 from: `"Vem Para Trilha" <${process.env.EMAIL_USER}>`, 
                 to: emailPrincipal,
-                subject: '✅ Vaga Garantida: Vem Para Trilha!', 
+                subject: '✅ Vaga Garantida: Trilha Aldeia!', 
                 html: `
                   <div style="font-family: Arial, sans-serif; max-w: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
                     <div style="background-color: #10b981; padding: 20px; text-align: center;">
@@ -89,9 +86,9 @@ export default async function handler(req, res) {
                       
                       <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;">
                         <h3 style="margin-top: 0; color: #111827;">Resumo do Evento</h3>
-                        <p style="margin: 5px 0;">📅 <strong>Data:</strong> 14/06/2026</p>
+                        <p style="margin: 5px 0;">📅 <strong>Data:</strong> 26/07/2026</p>
                         <p style="margin: 5px 0;">⏰ <strong>Horário:</strong> 07:00 às 12:00</p>
-                        <p style="margin: 5px 0;">📍 <strong>Local:</strong> Guabiraba, Recife - PE</p>
+                        <p style="margin: 5px 0;">📍 <strong>Local:</strong> Aldeia Chã da Peroba, PE</p>
                       </div>
 
                       <p style="margin-top: 25px; font-size: 14px;">Qualquer dúvida, chame no WhatsApp: <a href="https://wa.me/5581988227739" style="color: #10b981; font-weight: bold; text-decoration: none;">(81) 98822-7739</a></p>

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || 'https://revyeudqlndidaiprabc.supabase.co',
+  process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
 
@@ -13,9 +13,10 @@ export default async function handler(req, res) {
   try {
     const cpfTitular = participantes[0].cpf.replace(/\D/g, '');
     const telefoneTitular = participantes[0].phone.replace(/\D/g, '');
-    const webhookUrl = 'https://vemparatrilha.vercel.app/api/webhook';
+    
+    // Webhook dinâmico: lê o domínio do Vercel automaticamente
+    const webhookUrl = `https://${req.headers.host}/api/webhook`;
 
-    // === 1. PRIMEIRO: GERAMOS O PIX PARA TER O ID DO PAGAMENTO ===
     const payerName = participantes[0].name.trim().split(" ");
     const firstName = payerName[0];
     const lastName = payerName.length > 1 ? payerName.slice(1).join(" ") : "Participante";
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         transaction_amount: Number(valorTotal),
-        description: `Inscrição Trilha - ${participantes[0].name}`,
+        description: `Inscrição Trilha Aldeia - ${participantes[0].name}`,
         payment_method_id: 'pix',
         payer: {
           email: emailPrincipal,
@@ -44,14 +45,12 @@ export default async function handler(req, res) {
 
     const mpData = await response.json();
 
-    // Se der erro na geração do PIX, paramos aqui e avisamos o usuário
     if (!mpData.id) {
       return res.status(400).json({ error: 'Erro na API do Mercado Pago', details: mpData });
     }
 
     const idDoPagamento = mpData.id.toString();
 
-    // === 2. SEGUNDO: SALVAMOS NO BANCO COM O ID ÚNICO (SEM DELETAR HISTÓRICO) ===
     const dadosParaSalvar = participantes.map((p, index) => {
       const cpfLimpo = p.cpf ? p.cpf.replace(/\D/g, '') : null;
       
@@ -62,7 +61,7 @@ export default async function handler(req, res) {
         cpf: index === 0 ? cpfLimpo : null, 
         contato_emergencia: contatoEmergencia || null,
         pago: false,
-        payment_id: idDoPagamento // <--- Aqui está o pulo do gato! Salvando o recibo!
+        payment_id: idDoPagamento 
       };
     });
 
@@ -73,7 +72,6 @@ export default async function handler(req, res) {
       throw new Error(`Erro do Banco de Dados: ${erroInsert.message}`);
     }
 
-    // === 3. DEVOLVEMOS O QR CODE PARA A TELA ===
     res.status(200).json(mpData);
 
   } catch (error) {

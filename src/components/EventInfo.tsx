@@ -31,9 +31,9 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
       <section>
         <h2 className="text-2xl font-black uppercase italic mb-6 border-b border-zinc-900 pb-2 text-zinc-500">Descrição do evento</h2>
         <div className="space-y-6 text-zinc-400 text-lg leading-relaxed">
-          <p className="text-white font-bold italic">Trilha Santuário Dos três reinos</p>
-          <p>Precisa dar uma pausa na rotina? O projeto <span className="text-white font-bold text-emerald-500">Vem Para Trilha</span> preparou uma manhã de imersão completa na natureza para você respirar novos ares.</p>
-          <p>Nossa rota foi cuidadosamente desenhada para unir o desafio da caminhada com a paz da contemplação. Venha gastar energia na trilha e fechar a experiência com um refrescante banho de rio.</p>
+          <p className="text-white font-bold italic text-xl">Trilha Aldeia Chã da Peroba</p>
+          <p>Uma fuga perfeita da cidade. A equipe <span className="text-white font-bold text-emerald-500">Vem Para Trilha</span> convida você para uma manhã de imersão total no clima verde e acolhedor de Aldeia.</p>
+          <p>Essa é a oportunidade ideal para dar uma pausa na rotina acelerada, respirar ar puro e se reconectar. Nosso trajeto em Chã da Peroba foi planejado para proporcionar uma experiência segura, energizante e cheia de paz.</p>
         </div>
         <div className="mt-10">
           <h2 className="text-xl font-black uppercase italic mb-6 text-zinc-500 tracking-widest">Explore o Cenário</h2>
@@ -50,10 +50,12 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <div className="col-span-full"><h2 className="text-2xl font-black uppercase italic mb-6 border-b border-zinc-900 pb-2 text-zinc-500">Sobre o evento</h2></div>
-        <InfoRow icon={<Calendar />} title="Data" text="14 de Junho de 2026" />
+        <InfoRow icon={<Calendar />} title="Data" text="26 de Julho de 2026" />
         <InfoRow icon={<Clock />} title="Horário" text="07:00 às 12:00" />
-        <a href="https://www.google.com/maps/place/?q=place_id:ChIJ4-tYpb8RqwcRxSQFPEP7it4" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><InfoRow icon={<MapPin className="text-emerald-500" />} title="Localização" text="Guabiraba, Recife - PE" /></a>
-        <InfoRow icon={<Trophy />} title="Investimento" text="R$ 50 Individual | R$ 90 (Você + 1 Amigo)" />
+        <a href="https://www.google.com/maps/search/?api=1&query=Aldeia+Chã+da+Peroba" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+          <InfoRow icon={<MapPin className="text-emerald-500" />} title="Localização" text="Aldeia Chã da Peroba, PE" />
+        </a>
+        <InfoRow icon={<Trophy />} title="Investimento" text="R$ 55 Individual | R$ 100 Casadinha (Você + 1)" />
       </section>
 
       <section>
@@ -78,7 +80,13 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
               <p className="text-sm text-zinc-300 leading-relaxed">A área do evento é uma <strong className="text-white">propriedade privada</strong>. Somente pessoas com o nome na lista oficial de pagantes poderão entrar.</p>
             </div>
           </div>
-          <div className="bg-zinc-800/40 p-6 rounded-2xl border border-zinc-700/50 flex gap-5"><Ticket className="text-emerald-500 shrink-0" size={32}/><div><h4 className="font-bold text-white uppercase text-sm mb-2 tracking-widest">Investimento</h4><p className="text-sm text-zinc-400 leading-relaxed">R$ 50,00 (Individual) ou R$ 90,00 (Você + 1 Amigo). Vagas limitadas.</p></div></div>
+          <div className="bg-zinc-800/40 p-6 rounded-2xl border border-zinc-700/50 flex gap-5">
+            <Ticket className="text-emerald-500 shrink-0" size={32}/>
+            <div>
+              <h4 className="font-bold text-white uppercase text-sm mb-2 tracking-widest">Investimento</h4>
+              <p className="text-sm text-zinc-400 leading-relaxed">R$ 55,00 (Individual) ou R$ 100,00 (Casadinha). Vagas limitadas.</p>
+            </div>
+          </div>
           <div className="bg-zinc-800/40 p-6 rounded-2xl border border-zinc-700/50 flex gap-5"><VolumeX className="text-emerald-500 shrink-0" size={32}/><div><h4 className="font-bold text-white uppercase text-sm mb-2 tracking-widest">Som e Natureza</h4><p className="text-sm text-zinc-400 leading-relaxed">Não é permitido o uso de caixas de som em volume alto.</p></div></div>
           <div className="bg-zinc-800/40 p-6 rounded-2xl border border-zinc-700/50 flex gap-5"><QrCode className="text-emerald-500 shrink-0" size={32}/><div><h4 className="font-bold text-white uppercase text-sm mb-2 tracking-widest">Pagamento via PIX</h4><p className="text-sm text-zinc-400 leading-relaxed">Confirmação automática via PIX. Acréscimo de taxa de <strong className="text-emerald-500">R$ 1,00</strong>.</p></div></div>
           <div className="bg-zinc-800/40 p-6 rounded-2xl border border-zinc-700/50 flex gap-5"><Coffee className="text-emerald-500 shrink-0" size={32}/><div><h4 className="font-bold text-white uppercase text-sm mb-2 tracking-widest">Café Coletivo</h4><p className="text-sm text-zinc-400 leading-relaxed">Pedimos que cada participante leve um item para compartilhar.</p></div></div>

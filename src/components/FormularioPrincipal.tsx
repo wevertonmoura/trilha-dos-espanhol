@@ -3,7 +3,6 @@ import { ChevronRight, Loader2, AlertCircle, Plus, Trash2, Copy, QrCode, CheckCi
 import { motion } from 'framer-motion';
 import { validarCPF, formatarMoeda } from '../utils/helpers';
 
-// O formulário precisa saber quantas vagas existem para funcionar, por isso recebe essas propriedades:
 interface FormularioProps {
   vagasOcupadas: number;
   verificandoVagas: boolean;
@@ -15,7 +14,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
   const [errorMsg, setErrorMsg] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   
-  // Agora o formulário só se preocupa com a tela dele e a do PIX (o Admin ficou de fora)
   const [telaAtual, setTelaAtual] = useState<'formulario' | 'pix'>('formulario');
   const [statusPagamento, setStatusPagamento] = useState<'pendente' | 'pago'>('pendente');
   const [paymentId, setPaymentId] = useState<string | null>(null);
@@ -26,10 +24,9 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
 
   const taxaPix = 1;
   
-  // ATUALIZADO: Cálculo com os novos valores (Casadinha = 100 / Individual = 55)
   const calcularValorIngressos = (qtd: number) => {
     const pares = Math.floor(qtd / 2); 
-    const avulsos = qtd % 2;           
+    const avulsos = qtd % 2;          
     return (pares * 100) + (avulsos * 55);
   };
 
@@ -42,7 +39,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     { name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '' }
   ]);
 
-  // Cronômetro do PIX
   useEffect(() => {
     let timer: any;
     if (telaAtual === 'pix' && statusPagamento === 'pendente' && tempoRestante > 0) {
@@ -57,7 +53,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     return `${m}:${s}`;
   };
 
-  // Checagem contínua do pagamento
   useEffect(() => {
     let intervalo: any;
     if (paymentId && statusPagamento === 'pendente' && telaAtual === 'pix') {
@@ -189,6 +184,9 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     window.location.reload();
   };
 
+  // ESTILO PADRÃO DE ALTA RESPOSTA PARA TODOS OS INPUTS
+  const inputClass = "w-full bg-zinc-950/90 border border-zinc-700/80 rounded-xl px-4 py-3 text-white font-bold text-sm outline-none transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 hover:border-zinc-500 shadow-inner";
+
   return (
     <section id="inscricao" className="lg:sticky lg:top-8 bg-zinc-900/90 backdrop-blur-md border border-zinc-700/50 rounded-[2.5rem] p-6 md:p-10 shadow-2xl">
       
@@ -217,7 +215,7 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
               <form onSubmit={handleListaEspera} className="space-y-4">
                 <div className="space-y-1">
                   <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">Seu Nome</label>
-                  <input required type="text" value={listaEsperaNome} onChange={e => setListaEsperaNome(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700/50 rounded-xl px-4 py-3 text-white font-bold text-sm" placeholder="Nome e Sobrenome" />
+                  <input required type="text" value={listaEsperaNome} onChange={e => setListaEsperaNome(e.target.value)} className={inputClass} placeholder="Nome e Sobrenome" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">Seu WhatsApp</label>
@@ -226,9 +224,9 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
                     if (v.length > 2) v = `(${v.slice(0, 2)}) ${v.slice(2)}`;
                     if (v.length > 10) v = `${v.slice(0, 10)}-${v.slice(10)}`;
                     setListaEsperaFone(v);
-                  }} className="w-full bg-zinc-950 border border-zinc-700/50 rounded-xl px-4 py-3 text-white font-bold text-sm" placeholder="(81) 99999-9999" />
+                  }} className={inputClass} placeholder="(81) 99999-9999" />
                 </div>
-                <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-black py-4 rounded-xl shadow-xl mt-4 uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all">
+                <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-black py-4 rounded-xl shadow-xl mt-4 uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all cursor-pointer">
                   Entrar na Lista VIP <ChevronRight size={16}/>
                 </button>
               </form>
@@ -248,52 +246,54 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
         <>
           <div className="text-center mb-10 relative">
             <h2 className="text-4xl font-black uppercase italic tracking-tighter text-white">INSCRIÇÃO</h2>
-            {/* ATUALIZADO: Legenda de preços alinhada */}
-            <p className="text-emerald-500 text-sm font-bold mt-2 tracking-widest">R$ 55 INDIVIDUAL | R$ 100 CASADINHA</p>
+            <p className="text-emerald-500 text-sm font-bold mt-1 tracking-widest">R$ 55 INDIVIDUAL | R$ 100 CASADINHA</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-8">
             {participants.map((participant, index) => (
               <div key={index} className="p-6 rounded-3xl bg-zinc-800/40 border border-zinc-700/50 relative shadow-inner overflow-hidden">
-                <div className={`absolute top-0 left-0 w-1.5 h-full ${index === 0 ? 'bg-emerald-500' : 'bg-zinc-600'}`}></div>
+                <div className={`absolute top-0 left-0 w-1.5 h-full ${index === 0 ? 'bg-emerald-500' : 'bg-zinc-500'}`}></div>
 
-                <div className="flex justify-between items-center mb-4 pl-2 border-b border-zinc-700/50 pb-2">
-                  <h3 className={`text-[10px] font-black uppercase tracking-widest ${index === 0 ? 'text-emerald-500' : 'text-zinc-400'}`}>
+                <div className="flex justify-between items-center mb-5 pl-2 border-b border-zinc-700/50 pb-2.5">
+                  <h3 className={`text-[11px] font-black uppercase tracking-widest ${index === 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
                     {index === 0 ? "👤 Titular da Inscrição (Responsável)" : `👥 Acompanhante ${index}`}
                   </h3>
                   {index > 0 && (
-                    <button type="button" onClick={() => removeParticipant(index)} className="text-zinc-500 hover:text-red-500 transition-colors p-1" title="Remover Acompanhante"><Trash2 size={16} /></button>
+                    <button type="button" onClick={() => removeParticipant(index)} className="text-zinc-500 hover:text-red-500 transition-colors p-1 cursor-pointer" title="Remover Acompanhante"><Trash2 size={16} /></button>
                   )}
                 </div>
 
                 <div className="grid grid-cols-1 gap-5">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">Nome Completo</label>
-                    <input type="text" value={participant.name} onChange={e => updateParticipant(index, 'name', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="Ex: João Silva" />
+                    <input type="text" value={participant.name} onChange={e => updateParticipant(index, 'name', e.target.value)} className={inputClass} placeholder="Ex: João Silva" />
                   </div>
 
                   {index === 0 && (
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">WhatsApp</label>
-                          <input type="tel" value={participant.phone} onChange={e => updateParticipant(index, 'phone', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="(81) 99999-9999" />
+                          <input type="tel" value={participant.phone} onChange={e => updateParticipant(index, 'phone', e.target.value)} className={inputClass} placeholder="(81) 99999-9999" />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">CPF (Necessário para a compra)</label>
-                          <input type="text" required value={participant.cpf} onChange={e => updateParticipant(index, 'cpf', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="000.000.000-00" />
+                          <input type="text" required value={participant.cpf} onChange={e => updateParticipant(index, 'cpf', e.target.value)} className={inputClass} placeholder="000.000.000-00" />
                         </div>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-1.5">
                         <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">E-mail</label>
-                        <input type="email" value={participant.email} onChange={e => updateParticipant(index, 'email', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="seu@gmail.com" />
+                        <input type="email" value={participant.email} onChange={e => updateParticipant(index, 'email', e.target.value)} className={inputClass} placeholder="seu@gmail.com" />
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase text-zinc-400 ml-1">Contato de Emergência (SOS)</label>
-                        <div className="grid grid-cols-2 gap-3">
-                          <input type="text" value={participant.emergencyName} onChange={e => updateParticipant(index, 'emergencyName', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="Nome" />
-                          <input type="tel" value={participant.emergencyPhone} onChange={e => updateParticipant(index, 'emergencyPhone', e.target.value)} className="w-full bg-zinc-900/80 border border-zinc-700/50 rounded-xl px-4 py-3 focus:border-emerald-500 outline-none font-bold text-sm text-white transition-all shadow-sm" placeholder="(81) 99999-9999" />
+                      <div className="space-y-1.5 pt-2">
+                        <label className="text-[10px] font-black uppercase text-emerald-400 ml-1 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                          Contato de Emergência (SOS)
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <input type="text" value={participant.emergencyName} onChange={e => updateParticipant(index, 'emergencyName', e.target.value)} className={inputClass} placeholder="Nome do Parente/Amigo" />
+                          <input type="tel" value={participant.emergencyPhone} onChange={e => updateParticipant(index, 'emergencyPhone', e.target.value)} className={inputClass} placeholder="(81) 99999-9999" />
                         </div>
                       </div>
                     </>
@@ -302,12 +302,23 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
               </div>
             ))}
             
+            {/* BOTÃO DA CASADINHA TURBINADO */}
             {vagasOcupadas + participants.length < LIMITE_VAGAS && (
-               <button type="button" onClick={addParticipant} className="w-full py-4 border-2 border-dashed border-zinc-600 rounded-2xl text-zinc-400 font-bold hover:border-emerald-500 hover:text-emerald-500 transition-all flex items-center justify-center gap-2 uppercase text-[10px] tracking-widest"><Plus size={16} /> Comprar Ingresso Extra (Acompanhante)</button>
+              <motion.button 
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                type="button" 
+                onClick={addParticipant} 
+                className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-emerald-500/10 hover:from-emerald-500/20 hover:to-emerald-500/20 border-2 border-dashed border-emerald-500/40 hover:border-emerald-500 rounded-2xl text-emerald-400 hover:text-white font-black transition-all flex items-center justify-center gap-3 uppercase text-xs tracking-wider shadow-lg group cursor-pointer"
+              >
+                <span className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-zinc-950 transition-colors">
+                  <Plus size={16} />
+                </span>
+                <span>Adicionar Acompanhante (Casadinha)</span>
+              </motion.button>
             )}
 
-            {/* CAIXA DE TERMOS ATUALIZADA (LIGADA AO MODAL) */}
-            <label className="flex items-start gap-3 pt-6 border-t border-zinc-700/50 cursor-pointer group">
+            <label className="flex items-start gap-3 pt-4 border-t border-zinc-700/50 cursor-pointer group">
               <input type="checkbox" checked={termsAccepted} onChange={e => setTermsAccepted(e.target.checked)} className="mt-1 h-5 w-5 accent-emerald-500 cursor-pointer rounded shrink-0 group-hover:ring-2 ring-emerald-500/50 transition-all" />
               <span className="text-[11px] text-zinc-400 font-bold leading-relaxed select-none group-hover:text-zinc-300 transition-colors">
                 Aceito o Termo de Responsabilidade (declaro estar em boas condições de saúde). Li e aceito o{' '}
@@ -319,8 +330,8 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
 
             {errorMsg && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-[10px] font-bold flex items-center justify-center gap-2"><AlertCircle size={14}/> {errorMsg}</div>}
             
-            <button disabled={loading} className="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-black py-5 rounded-2xl shadow-xl transition-all uppercase tracking-widest flex items-center justify-center gap-3 text-sm mt-4 cursor-pointer">
-              {loading ? <Loader2 className="animate-spin" /> : <>Finalizar Inscrição (R$ {formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)}) <ChevronRight size={20} /></>}
+            <button disabled={loading} className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black py-5 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_45px_rgba(16,185,129,0.5)] transition-all uppercase tracking-widest flex items-center justify-center gap-3 text-sm mt-4 cursor-pointer">
+              {loading ? <Loader2 className="animate-spin text-zinc-950" /> : <>Finalizar Inscrição (R$ {formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)}) <ChevronRight size={20} /></>}
             </button>
           </form>
         </>
@@ -356,7 +367,7 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
                 ))}
               </div>
 
-              <button onClick={reiniciarCompra} className="mt-8 px-6 py-3 border border-zinc-700 hover:border-emerald-500 rounded-xl text-zinc-400 hover:text-emerald-500 text-xs font-bold uppercase tracking-widest transition-all">
+              <button onClick={reiniciarCompra} className="mt-8 px-6 py-3 border border-zinc-700 hover:border-emerald-500 rounded-xl text-zinc-400 hover:text-emerald-500 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer">
                 Fazer Nova Inscrição
               </button>
             </div>

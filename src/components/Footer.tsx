@@ -21,9 +21,8 @@ export default function Footer() {
 
   const linkGrupoGeral = "https://chat.whatsapp.com/H5DWJOz0wcC2PntYSq1t8y"; 
   const linkInstagram = "https://www.instagram.com/vempara_trilha?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="; 
-  const linkWhatsAppDireto = `https://wa.me/${81988227739}?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20trilha.`;
+  const linkWhatsAppDireto = `https://wa.me/5581988227739?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20trilha.`;
 
-  // Permite que qualquer botão do site dispare este modal (Ouvinte global)
   useEffect(() => {
     const handleOpen = (event: any) => setModalAberto(event.detail);
     window.addEventListener('abrirModalJuridico', handleOpen);
@@ -39,8 +38,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <div className="w-20 h-20 bg-zinc-800 rounded-full flex items-center justify-center mb-4 border border-zinc-700">
-              <span className="text-zinc-500 text-xs">LOGO</span>
+            {/* LOGÓTIPO OFICIAL INJETADO AQUI */}
+            <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-emerald-500/40 shadow-xl bg-zinc-900 flex items-center justify-center">
+              <img 
+                src="/logo.png" 
+                alt="Vem Para Trilha Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             
             <h3 className="text-emerald-500 font-black text-xl mb-2 uppercase">Vem Para Trilha</h3>
@@ -84,7 +88,6 @@ export default function Footer() {
 
         </div>
 
-        {/* Base do Rodapé COM OS BOTÕES QUE ABREM O MODAL */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 border-t border-zinc-900/80 pt-6">
           <div className="flex flex-col items-center md:items-start gap-3">
             <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
@@ -113,7 +116,7 @@ export default function Footer() {
 
       </div>
 
-      {/* A TELINHA (MODAL) QUE SALTA NA TELA */}
+      {/* MODAL JURÍDICO BLINDADO */}
       <AnimatePresence>
         {modalAberto && (
           <div 
@@ -121,7 +124,7 @@ export default function Footer() {
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
           >
             <motion.div 
-              onClick={(e) => e.stopPropagation()} // Impede que clicar no texto feche a tela
+              onClick={(e) => e.stopPropagation()} 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -135,26 +138,31 @@ export default function Footer() {
               </button>
 
               <h3 className="text-emerald-500 font-black text-xl uppercase mb-4 border-b border-zinc-800 pb-3">
-                {modalAberto === 'regulamento' ? 'Regulamento da Trilha' : 'Política de Reembolso'}
+                {modalAberto === 'regulamento' ? 'Regulamento Oficial da Trilha' : 'Política de Reembolso e Desistência'}
               </h3>
 
               <div className="text-zinc-300 text-sm space-y-4 leading-relaxed pr-2">
                 {modalAberto === 'regulamento' ? (
                   <>
-                    <p><strong>1. DO EVENTO</strong><br/>A trilha "Vem Para Trilha" será realizada em Aldeia Chã da Peroba, com saída rigorosamente às 07:00 da manhã.</p>
-                    <p><strong>2. CONDIÇÕES DE PARTICIPAÇÃO</strong><br/>Ao se inscrever, o participante declara estar em plenas condições de saúde física e mental para realizar o percurso, isentando a organização de qualquer responsabilidade sobre eventuais intercorrências médicas.</p>
-                    <p><strong>3. PRESERVAÇÃO AMBIENTAL</strong><br/>É estritamente proibido descartar qualquer tipo de lixo (embalagens de gel, garrafas, papéis) no percurso. O atleta que for flagrado sujando a trilha será banido dos próximos eventos.</p>
-                    <p><strong>4. EQUIPAMENTO OBRIGATÓRIO</strong><br/>É obrigatório o porte de recipiente próprio para hidratação (mochila de hidratação, garrafa ou copo retrátil). Em prol da natureza, não distribuiremos copos plásticos descartáveis.</p>
+                    <p><strong>1. DO EVENTO E PONTUALIDADE</strong><br/>A trilha será realizada em Aldeia Chã da Peroba. A saída ocorrerá rigorosamente às 07:00 da manhã. Tolerância de atraso zero para não prejudicar o planejamento do grupo.</p>
+                    
+                    <p><strong>2. CONDIÇÕES FÍSICAS E DE SAÚDE</strong><br/>Ao se inscrever, o participante declara estar em plenas condições de saúde física e mental para realizar o percurso, assumindo a responsabilidade sobre sua própria integridade.</p>
+                    
+                    <p><strong>3. CLASSIFICAÇÃO ETÁRIA E MENORES (A partir de 10 anos)</strong><br/>A idade mínima permitida para realizar o percurso é de <strong>10 anos completos</strong>. Por questões de segurança, todo e qualquer participante menor de 18 anos deverá estar, obrigatoriamente, acompanhado por um dos pais ou responsável legal devidamente inscrito no evento.</p>
+                    
+                    <p><strong>4. PRESERVAÇÃO AMBIENTAL (Lixo Zero)</strong><br/>É estritamente proibido descartar qualquer tipo de resíduo no percurso (garrafas, papéis, plásticos). O atleta flagrado sujando a natureza será banido de edições futuras.</p>
+                    
+                    <p><strong>5. EQUIPAMENTO OBRIGATÓRIO DE HIDRATAÇÃO</strong><br/>É obrigatório o porte de recipiente próprio (mochila de hidratação, garrafa ou copo retrátil). Em respeito ao meio ambiente, não haverá distribuição de copos plásticos descartáveis.</p>
                   </>
                 ) : (
                   <>
-                    <>
-                    <p><strong>1. PRAZO DE DESISTÊNCIA E REEMBOLSO</strong><br/>O participante tem o prazo legal de até 7 (sete) dias após a compra para solicitar o cancelamento com reembolso integral, <strong>desde que a solicitação seja feita com no mínimo 7 dias de antecedência da data do evento</strong>. Por conta da confecção e compra antecipada de medalhas e itens estruturais por atleta, solicitações feitas na semana da prova não poderão ser reembolsadas.</p>
+                    <p><strong>1. REGRA GERAL DE DESISTÊNCIA (Prazo de 7 dias)</strong><br/>Em conformidade com o Art. 49 do Código de Defesa do Consumidor, o participante tem o prazo de até 7 (sete) dias corridos <strong>após a data do pagamento</strong> para solicitar o cancelamento e obter o reembolso de 100% do valor.</p>
                     
-                    <p><strong>2. TRANSFERÊNCIA DE TITULARIDADE (VAGA)</strong><br/>Caso o atleta não possa comparecer e tenha perdido o prazo de reembolso, ele poderá transferir sua vaga para outro amigo sem custo adicional. Basta notificar a organização pelo WhatsApp com até 24 horas de antecedência da saída.</p>
+                    <p><strong>2. A "TRAVA" DA SEMANA DO EVENTO (Atenção Máxima)</strong><br/><strong>Faltando 7 dias ou menos para a realização da trilha, NÃO HAVERÁ REEMBOLSO em nenhuma hipótese.</strong> Como a organização realiza a compra antecipada e personalizada de medalhas, pulseiras de identificação e insumos estruturais exatos por atleta, inscrições realizadas na semana do evento ou desistências de última hora não poderão ser estornadas.</p>
                     
-                    <p><strong>3. ADIAMENTO POR FORÇA MAIOR</strong><br/>Em caso de chuvas severas ou alertas que coloquem a integridade física do grupo em risco, a organização poderá adiar a trilha. A inscrição de todos fica automaticamente garantida para a nova data oficial.</p>
-                  </>
+                    <p><strong>3. TRANSFERÊNCIA DE VAGA (Coloque um amigo no seu lugar)</strong><br/>Caso você não possa comparecer e tenha perdido o prazo de estorno, sua vaga não está perdida! Você poderá repassá-la para outra pessoa de forma 100% gratuita. Basta notificar a organização pelo WhatsApp com até 24 horas de antecedência da saída, enviando o nome, CPF e contato do novo titular.</p>
+                    
+                    <p><strong>4. ADIAMENTO POR CONDIÇÕES CLIMÁTICAS</strong><br/>A segurança dos participantes é a nossa prioridade absoluta. Em caso de chuvas severas ou alertas de risco emitidos pela Defesa Civil, a trilha será adiada. A inscrição de todos os atletas fica automaticamente garantida e transferida para a nova data oficial.</p>
                   </>
                 )}
               </div>

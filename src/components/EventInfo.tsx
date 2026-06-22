@@ -1,6 +1,6 @@
 // src/components/EventInfo.tsx
 
-import { Calendar, MapPin, Trophy, Clock, Mountain, Droplets, Info, Trash2, ShieldCheck, Waves, Maximize2, Ticket, VolumeX, QrCode, Coffee } from 'lucide-react';
+import { Calendar, MapPin, Trophy, Clock, Mountain, Droplets, Info, Trash2, ShieldCheck, Waves, Maximize2, Ticket, VolumeX, QrCode, Coffee, Footprints } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const InfoRow = ({ icon, title, text }: any) => (
@@ -55,6 +55,8 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
         <a href="https://www.google.com/maps/search/?api=1&query=Aldeia+Chã+da+Peroba" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
           <InfoRow icon={<MapPin className="text-emerald-500" />} title="Localização" text="Aldeia Chã da Peroba, PE" />
         </a>
+        {/* PONTO DE DECISÃO INJETADO AQUI */}
+        <InfoRow icon={<Footprints />} title="Percurso" text="13km • Ritmo Leve" />
         <InfoRow icon={<Trophy />} title="Investimento" text="R$ 55 Individual | R$ 100 Casadinha (Você + 1)" />
       </section>
 

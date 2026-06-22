@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, ArrowLeft } from 'lucide-react';
+import { X, Lock, ArrowLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // IMPORTAÇÕES
@@ -7,16 +7,14 @@ import Admin from './Admin';
 import HeroSection from './components/HeroSection';
 import EventInfo from './components/EventInfo';
 import Footer from './components/Footer';
-import FormularioPrincipal from './components/FormularioPrincipal'; // ← Nosso arquivo novo!
+import FormularioPrincipal from './components/FormularioPrincipal'; 
 
 const TrilhaAldeia = () => {
-  // Controle de Telas Globais
   const [telaAdmin, setTelaAdmin] = useState<'nao' | 'login' | 'painel'>('nao');
   const [senhaAdmin, setSenhaAdmin] = useState('');
   const [erroLoginAdmin, setErroLoginAdmin] = useState('');
   
-  // Controle de Vagas Global (usado pelo Hero e repassado pro Formulário)
-  const LIMITE_VAGAS = 60;
+  const LIMITE_VAGAS = 50;
   const [vagasOcupadas, setVagasOcupadas] = useState(0);
   const [verificandoVagas, setVerificandoVagas] = useState(true);
   
@@ -64,7 +62,6 @@ const TrilhaAldeia = () => {
     document.getElementById('inscricao')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // TELA DE ADMIN LOGIN
   if (telaAdmin === 'login') {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -80,9 +77,7 @@ const TrilhaAldeia = () => {
               <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Acesso Restrito</h2>
             </div>
             <form onSubmit={handleLoginAdmin} className="space-y-6">
-              <div className="space-y-2">
-                <input type="password" autoFocus placeholder="SENHA MESTRE" value={senhaAdmin} onChange={(e) => setSenhaAdmin(e.target.value)} className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-5 py-4 text-white text-center text-lg font-mono tracking-[0.2em] outline-none focus:border-emerald-500" />
-              </div>
+              <input type="password" autoFocus placeholder="SENHA MESTRE" value={senhaAdmin} onChange={(e) => setSenhaAdmin(e.target.value)} className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-5 py-4 text-white text-center text-lg font-mono tracking-[0.2em] outline-none focus:border-emerald-500" />
               {erroLoginAdmin && <div className="text-red-500 text-xs font-bold text-center animate-in shake">{erroLoginAdmin}</div>}
               <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-black py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all uppercase tracking-widest text-xs cursor-pointer">Desbloquear Cofre</button>
             </form>
@@ -93,15 +88,11 @@ const TrilhaAldeia = () => {
     );
   }
 
-  // TELA ADMIN
-  // @ts-ignore (Ignorando checagem de tipos do formato original)
   if (telaAdmin === 'painel') return <Admin senha={senhaAdmin} fecharAdmin={() => setTelaAdmin('nao')} />;
 
-  // TELA PRINCIPAL DO SITE
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500 overflow-x-hidden">
       
-      {/* MODAL DE IMAGEM */}
       <AnimatePresence>
         {selectedImg && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 cursor-pointer" onClick={() => setSelectedImg(null)}>
@@ -111,32 +102,35 @@ const TrilhaAldeia = () => {
         )}
       </AnimatePresence>
 
-      <HeroSection 
-        vagasOcupadas={vagasOcupadas} 
-        LIMITE_VAGAS={LIMITE_VAGAS} 
-        scrollToForm={scrollToForm} 
-        images={images} 
-      />
+      <HeroSection vagasOcupadas={vagasOcupadas} LIMITE_VAGAS={LIMITE_VAGAS} scrollToForm={scrollToForm} images={images} />
 
       <main className="container mx-auto px-4 md:px-6 py-12 max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          
-          <EventInfo 
-            images={images} 
-            setSelectedImg={setSelectedImg} 
-          />
-
+          <EventInfo images={images} setSelectedImg={setSelectedImg} />
           <div className="lg:col-span-1 mt-10 lg:mt-0">
-            {/* O FORMULÁRIO RODA AQUI, RECEBENDO AS VAGAS COMO INFORMAÇÃO */}
-            <FormularioPrincipal 
-              vagasOcupadas={vagasOcupadas}
-              verificandoVagas={verificandoVagas}
-              LIMITE_VAGAS={LIMITE_VAGAS}
-            />
+            <FormularioPrincipal vagasOcupadas={vagasOcupadas} verificandoVagas={verificandoVagas} LIMITE_VAGAS={LIMITE_VAGAS} />
           </div>
-
         </div>
       </main>
+
+      {/* BOTÃO CHICLETE GLOBAL (POSICIONADO AQUI PARA GARANTIR FLUTUAÇÃO) */}
+      <div className="fixed bottom-0 left-0 w-full bg-zinc-950/95 border-t border-zinc-800 px-5 py-3.5 z-40 md:hidden flex items-center justify-between backdrop-blur-lg shadow-[0_-15px_30px_rgba(0,0,0,0.6)]">
+        <div className="flex flex-col">
+          <span className="text-[9px] uppercase tracking-widest text-zinc-400 font-bold">Investimento</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-xl font-black text-white tracking-tight">R$ 55</span>
+            <span className="text-[10px] text-zinc-400 font-medium">/ indiv.</span>
+          </div>
+        </div>
+        <a 
+          href="#inscricao"
+          onClick={scrollToForm}
+          className="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl shadow-[0_0_25px_rgba(16,185,129,0.35)] flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+        >
+          <span>Garantir Vaga</span>
+          <ChevronRight size={16} />
+        </a>
+      </div>
 
       <Footer />
     </div>

@@ -65,7 +65,8 @@ export default async function handler(req, res) {
       };
     });
 
-    const { error: erroInsert } = await supabase.from('inscricao_trilha').insert(dadosParaSalvar);
+    //CORREÇÃO: Conectando o cano na tabela certa ('participantes')
+    const { error: erroInsert } = await supabase.from('participantes').insert(dadosParaSalvar);
     
     if (erroInsert) {
       console.error("Erro do Supabase:", erroInsert);

@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Pegamos a URL e a Chave das variáveis da Vercel (com um fallback para a sua URL fixa)
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://revyeudqlndidaiprabc.supabase.co';
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
@@ -23,19 +22,17 @@ export default async function handler(req, res) {
   try {
     const { senha } = req.body;
     
-    // O Plano B: Se a Vercel falhar em ler a variável, ele usa a sua senha mestra da Trilha
-    const senhaCorreta = process.env.VITE_SENHA_ADMIN || '85113257@we';
+    // 1. Usa estritamente a variável oficial da Vercel (sem fallback hardcoded)
+    const senhaCorreta = process.env.SENHA_ADMIN;
 
-    if (senha !== senhaCorreta) {
-      console.error("Acesso bloqueado: Senha digitada não confere.");
+    if (!senhaCorreta || senha !== senhaCorreta) {
+      console.error("Acesso bloqueado na listagem: Senha inválida.");
       return res.status(401).json({ error: 'Acesso negado' });
     }
 
-    console.log("Acesso liberado. Buscando invasores na tabela inscricao_trilha...");
-
-    // Busca os dados
+    // 2. BUSCA NA GAVETA CERTA ("participantes")
     const { data, error } = await supabase
-      .from('inscricao_trilha')
+      .from('participantes')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -44,7 +41,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: error.message });
     }
     
-    console.log(`Busca concluída! ${data ? data.length : 0} registros enviados para o painel.`);
     return res.status(200).json(data || []);
 
   } catch (err) {

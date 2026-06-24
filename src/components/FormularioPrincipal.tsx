@@ -100,14 +100,26 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     setParticipants(newParticipants);
   };
 
-  const handleListaEspera = (e: React.FormEvent) => {
+  // 100% SILENCIOSA: Salva no Supabase e dá o feedback visual sem abrir o zap
+  const handleListaEspera = async (e: React.FormEvent) => {
     e.preventDefault();
     if (listaEsperaNome.trim().length < 3 || listaEsperaFone.length < 14) {
-      alert("Preencha seus dados corretamente!"); return;
+      alert("Preencha seus dados corretamente!"); 
+      return;
     }
-    const msg = `🚀 *LISTA VIP - TRILHA ALDEIA* 🚀%0A%0A*Nome:* ${listaEsperaNome}%0A*WhatsApp:* ${listaEsperaFone}%0A%0AOlá! Vi que as vagas esgotaram. Gostaria de entrar na lista de espera caso alguém desista!`;
-    window.open(`https://wa.me/5581988227739?text=${msg}`, '_blank');
-    setEntrouLista(true);
+
+    try {
+      await fetch('/api/lista-espera', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: listaEsperaNome, telefone: listaEsperaFone })
+      });
+
+      setEntrouLista(true);
+    } catch (err) {
+      console.error("Erro ao registrar lista de espera:", err);
+      alert("Houve um erro ao registrar. Tente novamente!");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -143,8 +155,8 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     try {
       const mainEmergency = `${participants[0].emergencyName} - ${participants[0].emergencyPhone}`;
       const mainEmail = participants[0].email;
-      const valorTotal = Number((calcularValorIngressos(participants.length) + taxaPix).toFixed(2));
-
+      //const valorTotal = Number((calcularValorIngressos(participants.length) + taxaPix).toFixed(2));
+const valorTotal =1;
       const response = await fetch('/api/gerar-pix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

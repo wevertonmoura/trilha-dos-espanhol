@@ -15,7 +15,7 @@ const TrilhaAldeia = () => {
   const [senhaAdmin, setSenhaAdmin] = useState('');
   const [erroLoginAdmin, setErroLoginAdmin] = useState('');
   
-  const LIMITE_VAGAS = 50;
+  const LIMITE_VAGAS = 0;
   const [vagasOcupadas, setVagasOcupadas] = useState(0);
   const [verificandoVagas, setVerificandoVagas] = useState(true);
   

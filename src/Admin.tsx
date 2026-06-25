@@ -100,20 +100,41 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     finally { setExcluindoId(null); }
   };
 
-  // --- Acionamentos de WhatsApp Turbinados ---
+  // --- Acionamentos de WhatsApp Turbinados (Com Inteligência de Casadinha) ---
   const chamarNoWhatsApp = (telefone: string, nome: string, pago: boolean) => {
     let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     if (numeroFormatado.length === 10 || numeroFormatado.length === 11) numeroFormatado = '55' + numeroFormatado;
-    const primeiroNome = (nome || '').split(' ')[0]; 
     
+    // 1. Busca o participante clicado na memória para descobrir o código do Pix dele
+    const participanteClicado = adminData.find(p => p.telefone === telefone && p.nome === nome);
+    let nomesParaMensagem = (nome || '').split(' ')[0];
+    let isPlural = false;
+
+    // 2. Se achar o Pix dele, vasculha quem mais pagou junto no mesmo Pix
+    if (participanteClicado && participanteClicado.payment_id) {
+      const grupoDoPix = adminData.filter(p => p.payment_id === participanteClicado.payment_id);
+      const primeirosNomes = grupoDoPix.map(p => p.nome.split(' ')[0]);
+
+      if (primeirosNomes.length > 1) {
+        isPlural = true;
+        if (primeirosNomes.length === 2) {
+          nomesParaMensagem = `${primeirosNomes[0]} e ${primeirosNomes[1]}`;
+        } else {
+          // Se tiver 3 ou mais, coloca vírgulas e um "e" no final
+          const ultimo = primeirosNomes.pop();
+          nomesParaMensagem = `${primeirosNomes.join(', ')} e ${ultimo}`;
+        }
+      }
+    }
+
     let texto = "";
 
     if (pago) {
-      // MENSAGEM PARA QUEM PAGOU (O texto que você criou)
-      texto = `Fala, ${primeiroNome}! Aqui é da organização do Vem Para Trilha. Passando para agradecer pela sua inscrição! A sua compra para a Trilha Aldeia foi CONFIRMADA com sucesso! ✅\n\nA nossa aventura já é no dia 26 de Julho! ⛰️🔥\n\nQueria te pedir um favor: manda aqui o seu @ do Instagram e uma foto sua bem massa para a gente preparar a sua arte de presença confirmada, beleza?\n\nAh, só para avisar: na semana da trilha vamos criar um grupo oficial no WhatsApp com todo mundo que vai participar para passar a localização exata, ponto de encontro e os últimos detalhes, beleza? Nos vemos lá! 🎒💦`;
+      // TEXTO COM PLURAL AUTOMÁTICO (PAGO)
+      texto = `Fala, ${nomesParaMensagem}! Aqui é da organização do Vem Para Trilha. Passando para agradecer pela ${isPlural ? 'inscrição de vocês' : 'sua inscrição'}! A ${isPlural ? 'compra de vocês' : 'sua compra'} para a Trilha Aldeia foi CONFIRMADA com sucesso! ✅\n\nA nossa aventura já é no dia 26 de Julho! ⛰️🔥\n\nQueria pedir um favor: mandem aqui o ${isPlural ? '@ do Instagram de vocês e umas fotos bem massas' : 'seu @ do Instagram e uma foto sua bem massa'} para a gente preparar a arte de presença confirmada, beleza?\n\nAh, só para avisar: na semana da trilha vamos criar um grupo oficial no WhatsApp com todo mundo que vai participar para passar a localização exata, ponto de encontro e os últimos detalhes! Nos vemos lá! 🎒💦`;
     } else {
-      // MENSAGEM PARA QUEM ESTÁ PENDENTE (Resgate de venda)
-      texto = `Fala, ${primeiroNome}! Vi que a sua inscrição para a Trilha Aldeia ficou pendente. Aconteceu algum erro na hora de gerar o Pix? Se precisar de ajuda ou preferir fazer a transferência pela chave normal, é só me dar um alô aqui! 🚀`;
+      // TEXTO COM PLURAL AUTOMÁTICO (PENDENTE)
+      texto = `Fala, ${nomesParaMensagem}! Vi que a ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} para a Trilha Aldeia ficou pendente. Aconteceu algum erro na hora de gerar o Pix? Se precisarem de ajuda ou preferirem fazer a transferência pela chave normal, é só me dar um alô aqui! 🚀`;
     }
 
     const mensagem = encodeURIComponent(texto);

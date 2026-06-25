@@ -7,7 +7,8 @@ export default async function handler(req, res) {
   const { senha, id } = req.body;
   if (senha !== process.env.VITE_SENHA_ADMIN) return res.status(401).json({ error: 'Acesso negado' });
 
-  const { error } = await supabase.from('inscricao_trilha').delete().eq('id', id);
+  // CORREÇÃO: Tabela correta
+  const { error } = await supabase.from('participantes').delete().eq('id', id);
   if (error) return res.status(400).json({ error });
   
   return res.status(200).json({ success: true });

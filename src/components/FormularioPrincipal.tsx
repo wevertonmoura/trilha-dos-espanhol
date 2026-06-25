@@ -155,8 +155,8 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     try {
       const mainEmergency = `${participants[0].emergencyName} - ${participants[0].emergencyPhone}`;
       const mainEmail = participants[0].email;
-      //const valorTotal = Number((calcularValorIngressos(participants.length) + taxaPix).toFixed(2));
-const valorTotal =1;
+      const valorTotal = Number((calcularValorIngressos(participants.length) + taxaPix).toFixed(2));
+
       const response = await fetch('/api/gerar-pix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

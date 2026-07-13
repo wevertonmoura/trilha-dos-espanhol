@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://revyeudqlndidaiprabc.supabase.co';
+// Fallback limpo, sem apontar para URLs de projetos antigos
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
   try {
     const { senha } = req.body;
     
-    // 1. Usa estritamente a variável oficial da Vercel (sem fallback hardcoded)
+    // Autenticação simples via variável de ambiente da Vercel
     const senhaCorreta = process.env.SENHA_ADMIN;
 
     if (!senhaCorreta || senha !== senhaCorreta) {
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Acesso negado' });
     }
 
-    // 2. BUSCA NA GAVETA CERTA ("participantes")
+    // Busca na tabela oficial do novo projeto ("participantes")
     const { data, error } = await supabase
       .from('participantes')
       .select('*')

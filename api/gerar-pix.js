@@ -1,12 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+// Fallback robusto para garantir que a Vercel encontre a URL no back-end
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ message: 'Método não permitido' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Método não permitido' });
+  }
 
   const { participantes, valorTotal, emailPrincipal, contatoEmergencia } = req.body;
 
@@ -21,6 +24,7 @@ export default async function handler(req, res) {
     const firstName = payerName[0];
     const lastName = payerName.length > 1 ? payerName.slice(1).join(" ") : "Participante";
     
+    // Geração do PIX no Mercado Pago
     const response = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
@@ -30,7 +34,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         transaction_amount: Number(valorTotal),
-        description: `Inscrição Trilha Aldeia - ${participantes[0].name}`,
+        description: `Inscrição Trilha dos Espanhois - ${participantes[0].name}`,
         payment_method_id: 'pix',
         payer: {
           email: emailPrincipal,
@@ -51,6 +55,7 @@ export default async function handler(req, res) {
 
     const idDoPagamento = mpData.id.toString();
 
+    // Mapeamento de dados para salvar no Supabase
     const dadosParaSalvar = participantes.map((p, index) => {
       const cpfLimpo = p.cpf ? p.cpf.replace(/\D/g, '') : null;
       
@@ -65,7 +70,7 @@ export default async function handler(req, res) {
       };
     });
 
-    //CORREÇÃO: Conectando o cano na tabela certa ('participantes')
+    // Inserção na tabela 'participantes'
     const { error: erroInsert } = await supabase.from('participantes').insert(dadosParaSalvar);
     
     if (erroInsert) {
@@ -73,10 +78,10 @@ export default async function handler(req, res) {
       throw new Error(`Erro do Banco de Dados: ${erroInsert.message}`);
     }
 
-    res.status(200).json(mpData);
+    return res.status(200).json(mpData);
 
   } catch (error) {
     console.error("Erro no Servidor:", error);
-    res.status(500).json({ error: error.message || 'Erro interno ao processar inscrição' });
+    return res.status(500).json({ error: error.message || 'Erro interno ao processar inscrição' });
   }
 }

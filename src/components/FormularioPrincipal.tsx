@@ -39,6 +39,16 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     { name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '' }
   ]);
 
+  // TRAVA O SCROLL DA PÁGINA QUANDO O MODAL DO PIX ESTIVER ABERTO (Sênior UX)
+  useEffect(() => {
+    if (telaAtual === 'pix') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [telaAtual]);
+
   // TIMER DO PIX OTIMIZADO (Sem memory leak)
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -349,76 +359,135 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
           </form>
         </>
       ) : (
-        /* ESTADO 4: TELA DO PIX OU SUCESSO */
-        <div className="text-center space-y-8 animate-in fade-in zoom-in duration-500">
-          {statusPagamento === 'pago' ? (
-            <div className="py-2 space-y-6 flex flex-col items-center">
-              <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(16,185,129,0.4)]">
-                <CheckCircle size={40} className="text-white" />
-              </div>
-              <h2 className="text-3xl font-black uppercase italic text-white tracking-tighter">Pagamento <br /> Confirmado!</h2>
-              <p className="text-zinc-400 font-bold text-sm max-w-xs mx-auto">
-                O comprovante e os detalhes da sua inscrição foram enviados para o e-mail: <strong className="text-emerald-500">{participants[0].email}</strong>
-              </p>
-
-              <div className="space-y-4 text-left w-full max-w-md mx-auto pt-4 pb-2">
-                {participants.map((p, index) => (
-                  <motion.div 
-                    initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: index * 0.2 }} key={index} 
-                    className="bg-zinc-900/80 p-4 rounded-xl border border-emerald-500/20 flex items-center gap-4"
-                  >
-                    <div className="bg-emerald-500/10 p-3 rounded-lg">
-                      <Ticket className="text-emerald-500" size={24} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">
-                        {index === 0 ? "Titular" : "Acompanhante"}
-                      </p>
-                      <p className="text-white font-bold uppercase truncate">{p.name}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              <button onClick={reiniciarCompra} className="mt-8 px-6 py-3 border border-zinc-700 hover:border-emerald-500 rounded-xl text-zinc-400 hover:text-emerald-500 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer">
-                Fazer Nova Inscrição
-              </button>
+        /* ESTADO 4: MODAL FIXO DO PIX OU SUCESSO */
+        <>
+          {/* PLACEHOLDER NO FUNDO PARA A PÁGINA NÃO ENCOLHER */}
+          <div className="py-16 text-center space-y-4 animate-in fade-in duration-500">
+            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
+              <QrCode className="text-emerald-500 w-8 h-8" />
             </div>
-          ) : (
-            <>
-              <div className="flex flex-col items-center justify-center space-y-3">
-                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mb-2"><QrCode className="text-emerald-500 w-10 h-10" /></div>
-                <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">Escaneie o PIX</h2>
-              </div>
-              {qrCodeImg && (
-                <div className="flex justify-center my-6"><div className="bg-white p-3 rounded-2xl border-4 border-emerald-500/30"><img src={`data:image/jpeg;base64,${qrCodeImg}`} alt="PIX" className="w-48 h-48 rounded-lg" /></div></div>
-              )}
-              <div className="bg-zinc-800/40 border border-emerald-500/30 rounded-3xl p-6 shadow-inner relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
-                <p className="text-xs font-bold uppercase text-zinc-500 tracking-widest mb-2">Valor total</p>
-                <p className="text-5xl font-black text-white tracking-tighter">R$ {formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)}</p>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 bg-zinc-950 p-2 pl-4 rounded-xl border border-zinc-700/50">
-                  <span className="text-xs font-mono text-zinc-300 truncate w-full text-left">{qrCodePix}</span>
-                  <button onClick={copiarPix} className={`px-4 py-3 rounded-lg text-xs font-bold flex items-center gap-2 shrink-0 transition-all ${copiado ? 'bg-emerald-500 text-zinc-950' : 'bg-zinc-800 hover:bg-zinc-700 text-white cursor-pointer'}`}>
-                    {copiado ? <CheckCircle size={14} /> : <Copy size={14} />} 
-                    {copiado ? 'Copiado!' : 'Copiar'}
+            <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">
+              {statusPagamento === 'pago' ? 'Inscrição Confirmada!' : 'PIX Gerado com Sucesso!'}
+            </h3>
+            <p className="text-zinc-400 text-xs max-w-xs mx-auto">
+              {statusPagamento === 'pago' 
+                ? 'Sua vaga está garantida na Trilha dos Espanhóis.' 
+                : 'O painel de pagamento está fixado no centro da sua tela. Efetue o pagamento para garantir sua vaga.'}
+            </p>
+            <button 
+              onClick={reiniciarCompra} 
+              className="mt-4 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white font-bold text-xs rounded-xl uppercase tracking-wider transition-all cursor-pointer"
+            >
+              Fazer Nova Inscrição
+            </button>
+          </div>
+
+          {/* OVERLAY CENTRALIZADA E IMÓVEL QUE TRAVA O QR CODE NA TELA DO USUÁRIO */}
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 md:p-6 animate-in fade-in zoom-in-95 duration-300">
+            <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-zinc-900 border-2 border-emerald-500/40 rounded-[2.5rem] p-6 md:p-8 shadow-[0_0_60px_rgba(16,185,129,0.25)] text-center space-y-6">
+              
+              {statusPagamento === 'pago' ? (
+                <div className="py-2 space-y-6 flex flex-col items-center animate-in zoom-in duration-300">
+                  <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+                    <CheckCircle size={40} className="text-white" />
+                  </div>
+                  <h2 className="text-3xl font-black uppercase italic text-white tracking-tighter">Pagamento <br /> Confirmado!</h2>
+                  <p className="text-zinc-400 font-bold text-sm max-w-xs mx-auto">
+                    O comprovante e os detalhes da sua inscrição foram enviados para o e-mail: <strong className="text-emerald-500">{participants[0].email}</strong>
+                  </p>
+
+                  <div className="space-y-3 text-left w-full max-w-md mx-auto pt-2 pb-2">
+                    {participants.map((p, index) => (
+                      <motion.div 
+                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: index * 0.2 }} key={index} 
+                        className="bg-zinc-950 p-3.5 rounded-xl border border-emerald-500/20 flex items-center gap-4 shadow-inner"
+                      >
+                        <div className="bg-emerald-500/10 p-2.5 rounded-lg shrink-0">
+                          <Ticket className="text-emerald-500" size={20} />
+                        </div>
+                        <div className="overflow-hidden">
+                          <p className="text-[10px] uppercase text-zinc-500 font-bold tracking-widest">
+                            {index === 0 ? "Titular" : "Acompanhante"}
+                          </p>
+                          <p className="text-white font-bold uppercase truncate text-sm">{p.name}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <button onClick={reiniciarCompra} className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black rounded-xl text-xs uppercase tracking-widest transition-all shadow-lg cursor-pointer">
+                    Concluir e Fazer Nova Inscrição
                   </button>
                 </div>
-                {tempoRestante > 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-2 mt-4">
-                    <p className="text-[10px] uppercase tracking-widest text-emerald-500 font-bold animate-pulse">Aguardando pagamento...</p>
-                    <div className="flex items-center gap-2 text-2xl font-mono bg-zinc-900 px-4 py-2 rounded-xl border border-zinc-800 text-white"><Clock size={20} className="text-emerald-500" /><span>{formatarTempo(tempoRestante)}</span></div>
-                    <p className="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Tempo para o PIX expirar</p>
+              ) : (
+                <>
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="w-14 h-14 bg-emerald-500/20 rounded-full flex items-center justify-center"><QrCode className="text-emerald-500 w-8 h-8 animate-pulse" /></div>
+                    <h2 className="text-2xl font-black uppercase italic tracking-tighter text-white">Escaneie o PIX</h2>
+                    <p className="text-xs text-zinc-400">Pague agora para confirmar automaticamente sua inscrição!</p>
                   </div>
-                ) : (
-                  <div className="text-red-500 font-bold text-xs mt-4 bg-red-500/10 p-4 rounded-xl border border-red-500/30">Tempo expirado! Por favor, recarregue a página e gere uma nova inscrição.</div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
+
+                  {qrCodeImg && (
+                    <div className="flex justify-center my-4">
+                      <div className="bg-white p-3 rounded-2xl border-4 border-emerald-500/30 shadow-xl">
+                        <img src={`data:image/jpeg;base64,${qrCodeImg}`} alt="PIX" className="w-48 h-48 rounded-lg object-contain mx-auto" />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bg-zinc-950 border border-emerald-500/30 rounded-2xl p-4 shadow-inner relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
+                    <p className="text-[10px] font-bold uppercase text-zinc-500 tracking-widest mb-1">Valor Total a Pagar</p>
+                    <p className="text-4xl font-black text-white tracking-tighter">R$ {formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)}</p>
+                  </div>
+
+                  <div className="space-y-3 pt-2">
+                    <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-wider text-left">Ou copie o código PIX abaixo:</p>
+                    <div className="flex items-center gap-2 bg-zinc-950 p-1.5 pl-4 rounded-xl border border-zinc-700/80">
+                      <input 
+                        type="text" 
+                        readOnly 
+                        value={qrCodePix} 
+                        className="w-full bg-transparent text-xs font-mono text-zinc-300 outline-none select-all truncate"
+                      />
+                      <button onClick={copiarPix} className={`px-4 py-3 rounded-lg text-xs font-bold flex items-center gap-2 shrink-0 transition-all cursor-pointer ${copiado ? 'bg-emerald-500 text-zinc-950 shadow-md' : 'bg-zinc-800 hover:bg-zinc-700 text-white'}`}>
+                        {copiado ? <CheckCircle size={14} /> : <Copy size={14} />} 
+                        {copiado ? 'Copiado!' : 'Copiar'}
+                      </button>
+                    </div>
+
+                    {tempoRestante > 0 ? (
+                      <div className="flex flex-col items-center justify-center gap-2 pt-2">
+                        <p className="text-[10px] uppercase tracking-widest text-emerald-400 font-bold animate-pulse">⌛ Aguardando confirmação do banco...</p>
+                        <div className="flex items-center gap-2 text-xl font-mono bg-zinc-950 px-4 py-2 rounded-xl border border-zinc-800 text-white shadow-inner">
+                          <Clock size={18} className="text-emerald-500" />
+                          <span>{formatarTempo(tempoRestante)}</span>
+                        </div>
+                        <p className="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Tempo para o código expirar</p>
+                      </div>
+                    ) : (
+                      <div className="text-red-400 font-bold text-xs mt-4 bg-red-500/10 p-4 rounded-xl border border-red-500/30">
+                        Tempo expirado! Por favor, feche e gere uma nova inscrição.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* BOTÃO SÊNIOR PARA VOLTAR E EDITAR SE DIGITOU ALGO ERRADO */}
+                  <div className="border-t border-zinc-800 pt-4 mt-2">
+                    <button 
+                      type="button"
+                      onClick={() => setTelaAtual('formulario')} 
+                      className="text-zinc-500 hover:text-zinc-300 text-[11px] font-bold uppercase tracking-widest underline cursor-pointer transition-colors"
+                    >
+                      ← Voltar e editar dados da inscrição
+                    </button>
+                  </div>
+                </>
+              )}
+
+            </div>
+          </div>
+        </>
       )}
     </section>
   );

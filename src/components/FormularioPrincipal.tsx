@@ -30,7 +30,7 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
   const calcularValorIngressos = (qtd: number) => {
     const pares = Math.floor(qtd / 2); 
     const avulsos = qtd % 2;          
-    return (pares * 100) + (avulsos * 55);
+    return (pares * 100) + (avulsos * 0.55);
   };
 
   const [qrCodePix, setQrCodePix] = useState(''); 

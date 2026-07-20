@@ -38,12 +38,10 @@ export default function PixModal({
   reiniciarCompra
 }: PixModalProps) {
 
-  // ✨ Trava a rolagem do site de trás para o usuário rolar apenas a tela do PIX!
+  // ✨ TRAVA O SCROLL DE FUNDO: Garante que a pessoa só rola a tela do PIX
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    return () => { document.body.style.overflow = 'unset'; };
   }, []);
 
   // 🛡️ LÓGICA BLINDADA DO QR CODE
@@ -57,10 +55,11 @@ export default function PixModal({
   const valorExibicao = String(formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)).replace('R$', '').trim();
 
   return (
-    /* 🚀 TELA CHEIA SÓLIDA (bg-slate-50): Esconde o cabeçalho, o rodapé e foca 100% no pagamento */
-    <div className="fixed inset-0 z-[99999] bg-slate-50 overflow-y-auto px-4 py-6 sm:p-10 flex justify-center items-start">
+    /* 🚀 TELA CHEIA SÓLIDA: Cobre todo o site, esconde cabeçalho e rodapé */
+    <div className="fixed inset-0 z-[999999] bg-slate-50 overflow-y-auto flex flex-col items-center pt-8 pb-20 px-4 sm:px-6">
       
-      <div className="w-full max-w-lg bg-white border border-slate-200/80 rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 shadow-[0_15px_50px_rgba(0,0,0,0.06)] text-center space-y-5 text-slate-800 animate-in fade-in slide-in-from-bottom-8 duration-500 mb-10 mt-2 sm:mt-6">
+      {/* Container principal do PIX (Limpo e focado) */}
+      <div className="w-full max-w-lg bg-white border border-slate-200/80 rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 shadow-2xl text-center space-y-5 text-slate-800 animate-in fade-in slide-in-from-bottom-8 duration-500">
         
         {statusPagamento === 'pago' ? (
           /* ============================================================================
@@ -85,7 +84,6 @@ export default function PixModal({
               </h2>
             </div>
 
-            {/* DESTAQUE DO E-MAIL */}
             <div className="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-inner space-y-1 text-left">
               <p className="text-slate-500 font-semibold text-[11px] sm:text-xs leading-relaxed">
                 📧 O comprovante e os detalhes foram enviados para:
@@ -95,8 +93,7 @@ export default function PixModal({
               </p>
             </div>
 
-            {/* LISTA DE PARTICIPANTES */}
-            <div className="space-y-2 text-left pt-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+            <div className="space-y-2 text-left pt-1 max-h-60 overflow-y-auto pr-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center mb-1">
                 Participantes Confirmados ({participants.length})
               </p>
@@ -127,7 +124,7 @@ export default function PixModal({
           </motion.div>
         ) : (
           /* ============================================================================
-             ⏳ TELA DE PAGAMENTO (FUNDO BRANCO LIMPO)
+             ⏳ TELA DE PAGAMENTO LIMPÍSSIMA (SEM CABEÇALHO)
              ============================================================================ */
           <>
             <div className="flex flex-col items-center justify-center space-y-1">
@@ -150,7 +147,6 @@ export default function PixModal({
               /* --- SUB-TELA: PIX ATIVO --- */
               <div className="space-y-4">
                 
-                {/* BLOCO DO QR CODE COMPACTO */}
                 <div className="flex justify-center my-2">
                   <div className="bg-white p-2 sm:p-3 rounded-2xl border-2 border-sky-200 shadow-md min-w-[180px] min-h-[180px] sm:min-w-[200px] sm:min-h-[200px] flex items-center justify-center">
                     {qrCodeImg ? (
@@ -204,14 +200,14 @@ export default function PixModal({
                   </div>
                 </div>
 
-                {/* BOTÃO PARA VOLTAR E CANCELAR/EDITAR (ELEGANTEMENTE NO TOPO DA BORDA DE BAIXO) */}
-                <div className="border-t border-slate-100 pt-3 mt-1">
+                {/* BOTÃO PARA VOLTAR SE A PESSOA QUISER DESISTIR OU EDITAR */}
+                <div className="border-t border-slate-100 pt-4 mt-2">
                   <button 
                     type="button"
                     onClick={() => setTelaAtual('formulario')} 
-                    className="flex items-center justify-center gap-1.5 w-full text-slate-400 hover:text-slate-700 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest cursor-pointer transition-colors"
+                    className="flex items-center justify-center gap-1 w-full text-slate-400 hover:text-slate-700 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors cursor-pointer"
                   >
-                    <ArrowLeft size={14} /> Voltar e editar dados
+                    <ArrowLeft size={14} /> Voltar e editar dados da inscrição
                   </button>
                 </div>
               </div>
@@ -241,6 +237,7 @@ export default function PixModal({
             )}
           </>
         )}
+
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { QrCode, CheckCircle, Ticket, Clock, Copy, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatarMoeda } from '../utils/helpers';

@@ -1,4 +1,4 @@
-
+import { useEffect } from 'react';
 import { QrCode, CheckCircle, Ticket, Clock, Copy, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatarMoeda } from '../utils/helpers';
@@ -38,11 +38,20 @@ export default function PixModal({
   reiniciarCompra
 }: PixModalProps) {
 
-  // LÓGICA DO SEU SNIPPET: Previne erro no Base64 caso já venha com ou sem o prefixo data:image
-  const getQrCodeImageSrc = (imgString: string) => {
+  // ✨ TRAVA DE SCROLL SEGURA: Impede que o site fique travado/congelado ao fechar o modal
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  // 🛡️ LÓGICA BLINDADA DO QR CODE: Limpa espaços, quebras de linha e verifica o prefixo data:image
+  const getQrCodeImageSrc = (imgString?: string) => {
     if (!imgString) return '';
-    if (imgString.startsWith('data:image')) return imgString;
-    return `data:image/jpeg;base64,${imgString}`;
+    const limpa = String(imgString).trim().replace(/(\r\n|\n|\r)/gm, '');
+    if (limpa.startsWith('data:image')) return limpa;
+    return `data:image/jpeg;base64,${limpa}`;
   };
 
   // Previne o duplo "R$" limpando caso o helper já traga a formatação
@@ -162,17 +171,30 @@ export default function PixModal({
               {tempoRestante > 0 ? (
                 /* --- SUB-TELA: PIX ATIVO --- */
                 <div className="space-y-4">
-                  {qrCodeImg && (
-                    <div className="flex justify-center my-4">
-                      <div className="bg-white p-3 rounded-2xl border-2 border-sky-200 shadow-lg">
+                  
+                  {/* BLOCO DO QR CODE BLINDADO COM FALLBACK VISUAL */}
+                  <div className="flex justify-center my-4">
+                    <div className="bg-white p-3 rounded-2xl border-2 border-sky-200 shadow-lg min-w-[216px] min-h-[216px] flex items-center justify-center">
+                      {qrCodeImg ? (
                         <img 
                           src={getQrCodeImageSrc(qrCodeImg)} 
                           alt="QR Code PIX Trilha" 
-                          className="w-48 h-48 rounded-lg object-contain mx-auto" 
+                          className="w-48 h-48 rounded-lg object-contain mx-auto animate-in fade-in duration-300" 
+                          onError={(e) => {
+                            console.error("Erro ao renderizar imagem Base64 do PIX");
+                            e.currentTarget.style.display = 'none';
+                          }}
                         />
-                      </div>
+                      ) : (
+                        <div className="text-center p-4 space-y-2 max-w-[180px]">
+                          <QrCode className="w-10 h-10 text-sky-400 mx-auto animate-pulse" />
+                          <p className="text-[10px] text-slate-400 font-bold leading-tight">
+                            Use o código Copia e Cola abaixo para pagar
+                          </p>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
 
                   <div className="space-y-3 pt-1">
                     <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider text-left">Ou copie o código PIX abaixo:</p>

@@ -42,14 +42,7 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     { name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '' }
   ]);
 
-  useEffect(() => {
-    if (telaAtual === 'pix') {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [telaAtual]);
+  // ✨ REMOVIDO: O useEffect que travava o scroll (document.body.style.overflow = 'hidden') foi apagado!
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -251,7 +244,7 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
           inputClass={inputClass}
         />
       ) : (
-        /* ESTADO 4: MODAL FIXO E CENTRALIZADO DO PIX EM TEMA CLARO */
+        /* ESTADO 4: PAINEL DE PAGAMENTO PIX DIRETO NO FLUXO NORMAL */
         <PixModal 
           statusPagamento={statusPagamento}
           participants={participants}

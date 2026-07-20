@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { QrCode, CheckCircle, Ticket, Clock, Copy, RefreshCw, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatarMoeda } from '../utils/helpers';
@@ -38,13 +37,7 @@ export default function PixModal({
   reiniciarCompra
 }: PixModalProps) {
 
-  // ✨ UX NORMAL FLOW: Apenas rola suavemente para o topo ao carregar a tela de PIX
-  // (Removemos o 'overflow = hidden' para a página rolar naturalmente para baixo!)
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  // 🛡️ LÓGICA BLINDADA DO QR CODE
+  // Lógica de sanitização da string do QR Code
   const getQrCodeImageSrc = (imgString?: string) => {
     if (!imgString) return '';
     const limpa = String(imgString).trim().replace(/(\r\n|\n|\r)/gm, '');
@@ -55,12 +48,13 @@ export default function PixModal({
   const valorExibicao = String(formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)).replace('R$', '').trim();
 
   return (
-    /* 🚀 INSERIDO DIRETO NO FLUXO DA PÁGINA: Sem overlay escuro, centralizado e com margens adequadas */
-    <div className="w-full max-w-lg mx-auto bg-white border-2 border-sky-400/40 rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 shadow-xl text-center space-y-5 text-slate-800 my-6 sm:my-10 animate-in fade-in zoom-in-95 duration-500">
+    /* Renderizado no fluxo normal da página: 
+       Sem fixed/inset-0, sem document.body.overflow='hidden' e sem window.scrollTo */
+    <div className="w-full max-w-lg mx-auto bg-white border-2 border-sky-400/40 rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 shadow-xl text-center space-y-5 text-slate-800 my-4 sm:my-8 animate-in fade-in duration-500">
       
       {statusPagamento === 'pago' ? (
         /* ============================================================================
-           🎉 CARD DE CELEBRAÇÃO (PAGAMENTO APROVADO)
+           CARD DE CELEBRAÇÃO (PAGAMENTO APROVADO)
            ============================================================================ */
         <motion.div 
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -81,7 +75,6 @@ export default function PixModal({
             </h2>
           </div>
 
-          {/* DESTAQUE DO E-MAIL */}
           <div className="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-inner space-y-1 text-left">
             <p className="text-slate-500 font-semibold text-[11px] sm:text-xs leading-relaxed">
               📧 O comprovante e os detalhes foram enviados para:
@@ -91,7 +84,6 @@ export default function PixModal({
             </p>
           </div>
 
-          {/* LISTA DE PARTICIPANTES */}
           <div className="space-y-2 text-left pt-1 max-h-60 overflow-y-auto pr-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center mb-1">
               Participantes Confirmados ({participants.length})
@@ -123,7 +115,7 @@ export default function PixModal({
         </motion.div>
       ) : (
         /* ============================================================================
-           ⏳ TELA DE PAGAMENTO (FLUXO NORMAL NA PÁGINA)
+           TELA DE PAGAMENTO (FLUXO NORMAL)
            ============================================================================ */
         <>
           <div className="flex flex-col items-center justify-center space-y-1">
@@ -146,7 +138,6 @@ export default function PixModal({
             /* --- SUB-TELA: PIX ATIVO --- */
             <div className="space-y-4">
               
-              {/* BLOCO DO QR CODE */}
               <div className="flex justify-center my-2">
                 <div className="bg-white p-2 sm:p-3 rounded-2xl border-2 border-sky-200 shadow-md min-w-[180px] min-h-[180px] sm:min-w-[200px] sm:min-h-[200px] flex items-center justify-center">
                   {qrCodeImg ? (
@@ -200,7 +191,6 @@ export default function PixModal({
                 </div>
               </div>
 
-              {/* BOTÃO PARA VOLTAR E EDITAR */}
               <div className="border-t border-slate-100 pt-3 mt-1">
                 <button 
                   type="button"

@@ -172,7 +172,7 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 relative z-10">
-          <CheckItem icon={<Droplets size={20} />} text="Água gelada (1,5 a 2 litros)" tag="Essencial" />
+          <CheckItem icon={<Droplets size={20} />} text="Água  (1,5 a 2 litros)" tag="Essencial" />
           <CheckItem icon={<Sun size={20} />} text="Protetor solar e óculos" tag="UV" />
           <CheckItem icon={<Waves size={20} />} text="Roupa de banho para o mar" tag="Litoral" />
           <CheckItem icon={<Info size={20} />} text="Boné, viseira ou chapéu" tag="Conforto" />

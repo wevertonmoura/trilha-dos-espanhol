@@ -130,11 +130,11 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     let texto = "";
 
     if (pago) {
-      // TEXTO COM PLURAL AUTOMÁTICO (PAGO)
-      texto = `Fala, ${nomesParaMensagem}! Aqui é da organização do Vem Para Trilha. Passando para agradecer pela ${isPlural ? 'inscrição de vocês' : 'sua inscrição'}! A ${isPlural ? 'compra de vocês' : 'sua compra'} para a Trilha Aldeia foi CONFIRMADA com sucesso! ✅\n\nA nossa aventura já é no dia 26 de Julho! ⛰️🔥\n\nQueria pedir um favor: mandem aqui o ${isPlural ? '@ do Instagram de vocês e umas fotos bem massas' : 'seu @ do Instagram e uma foto sua bem massa'} para a gente preparar a arte de presença confirmada, beleza?\n\nAh, só para avisar: na semana da trilha vamos criar um grupo oficial no WhatsApp com todo mundo que vai participar para passar a localização exata, ponto de encontro e os últimos detalhes! Nos vemos lá! 🎒💦`;
+      // TEXTO COM PLURAL AUTOMÁTICO (PAGO) - ATUALIZADO
+      texto = `Fala, ${nomesParaMensagem}! Aqui é da organização do Vem Para Trilha. Passando para agradecer pela ${isPlural ? 'inscrição de vocês' : 'sua inscrição'}! A ${isPlural ? 'compra de vocês' : 'sua compra'} para a Trilha dos Espanhóis foi CONFIRMADA com sucesso! ✅\n\nA nossa aventura já é no dia 16 de Agosto! ⛰️🔥\n\nQueria pedir um favor: mandem aqui o ${isPlural ? '@ do Instagram de vocês e umas fotos bem massas' : 'seu @ do Instagram e uma foto sua bem massa'} para a gente preparar a arte de presença confirmada, beleza?\n\nAh, só para avisar: na semana da trilha vamos criar um grupo oficial no WhatsApp com todo mundo que vai participar para passar a localização exata, ponto de encontro e os últimos detalhes! Nos vemos lá! 🎒💦`;
     } else {
-      // TEXTO COM PLURAL AUTOMÁTICO (PENDENTE)
-      texto = `Fala, ${nomesParaMensagem}! Vi que a ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} para a Trilha Aldeia ficou pendente. Aconteceu algum erro na hora de gerar o Pix? Se precisarem de ajuda ou preferirem fazer a transferência pela chave normal, é só me dar um alô aqui! 🚀`;
+      // TEXTO COM PLURAL AUTOMÁTICO (PENDENTE) - ATUALIZADO
+      texto = `Fala, ${nomesParaMensagem}! Vi que a ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} para a Trilha dos Espanhóis ficou pendente. Aconteceu algum erro na hora de gerar o Pix? Se precisarem de ajuda ou preferirem fazer a transferência pela chave normal, é só me dar um alô aqui! 🚀`;
     }
 
     const mensagem = encodeURIComponent(texto);
@@ -145,7 +145,8 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     if (numeroFormatado.length === 10 || numeroFormatado.length === 11) numeroFormatado = '55' + numeroFormatado;
     const primeiroNome = (nome || '').split(' ')[0]; 
-    const mensagem = encodeURIComponent(`Olá ${primeiroNome}! Aqui é da organização da Trilha Aldeia. Surgiu uma vaga de desistência! Você ainda tem interesse em participar?`);
+    // MENSAGEM DE RESGATE - ATUALIZADA
+    const mensagem = encodeURIComponent(`Olá ${primeiroNome}! Aqui é da organização da Trilha dos Espanhóis. Surgiu uma vaga de desistência! Você ainda tem interesse em participar?`);
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
 
@@ -153,10 +154,10 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
   const exportarPlanilha = () => { /* Lógica futura */ };
   const exportarPlanilhaCompleta = () => { /* Lógica futura */ };
 
-  // Cálculos Financeiros (Somente da aba de inscritos oficiais)
+  // Cálculos Financeiros (Somente da aba de inscritos oficiais) - ATUALIZADO (200 casadinha, 110 individual)
   const totalPagos = adminData.filter(p => p.pago).length;
   const totalPendentes = adminData.length - totalPagos;
-  const arrecadado = (Math.floor(totalPagos / 2) * 100) + ((totalPagos % 2) * 55); 
+  const arrecadado = (Math.floor(totalPagos / 2) * 200) + ((totalPagos % 2) * 110); 
   
   // Filtros de Busca independentes
   const inscritosFiltrados = adminData.filter(p => (p.nome || '').toLowerCase().includes(busca.toLowerCase()) || (p.telefone || '').includes(busca));

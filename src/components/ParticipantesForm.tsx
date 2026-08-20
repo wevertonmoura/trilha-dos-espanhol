@@ -49,7 +49,8 @@ export default function ParticipantesForm({
     <>
       <div className="text-center mb-10 relative">
         <h2 className="text-4xl font-black uppercase italic tracking-tighter text-slate-900">INSCRIÇÃO</h2>
-        <p className="text-sky-600 text-sm font-extrabold mt-1 tracking-widest">R$ 55 INDIVIDUAL | R$ 100 CASADINHA</p>
+        {/* CORREÇÃO AQUI: Atualizado para R$ 110 e R$ 200 */}
+        <p className="text-sky-600 text-sm font-extrabold mt-1 tracking-widest">R$ 110 INDIVIDUAL | R$ 200 CASADINHA</p>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-8">

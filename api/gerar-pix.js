@@ -12,8 +12,45 @@ export default async function handler(req, res) {
   }
 
   const { participantes, valorTotal, emailPrincipal, contatoEmergencia } = req.body;
+  const LIMITE_VAGAS = 26;
 
   try {
+    // =====================================================================
+    // 🛡️ TRAVA 1: VERIFICAÇÃO DE VAGAS NO BACKEND (Contra Overbooking)
+    // =====================================================================
+    const { count, error: erroCount } = await supabase
+      .from('participantes')
+      .select('*', { count: 'exact', head: true })
+      .eq('pago', true); // Só conta quem efetivamente já pagou
+
+    if (erroCount) {
+      throw new Error('Erro ao checar limite de vagas no banco de dados.');
+    }
+
+    if (count + participantes.length > LIMITE_VAGAS) {
+      return res.status(400).json({ 
+        error: `Inscrição barrada: Limite de vagas excedido! Restam apenas ${LIMITE_VAGAS - count} vaga(s).` 
+      });
+    }
+
+    // =====================================================================
+    // 🛡️ TRAVA 2: VALIDAÇÃO DE PREÇO (Contra Fraude de Request)
+    // =====================================================================
+    const qtd = participantes.length;
+    const pares = Math.floor(qtd / 2);
+    const avulsos = qtd % 2;
+    // R$ 200 a casadinha, R$ 110 o individual + R$ 1 real de taxa do sistema
+    const valorEsperado = (pares * 200) + (avulsos * 110) + 1; 
+
+    if (Number(valorTotal) !== valorEsperado) {
+      return res.status(400).json({ 
+        error: 'Tentativa de manipulação de valor detectada. A transação foi bloqueada por segurança.' 
+      });
+    }
+
+    // =====================================================================
+    // GERAÇÃO DO PIX E INSERÇÃO DE DADOS (Fluxo Normal)
+    // =====================================================================
     const cpfTitular = participantes[0].cpf.replace(/\D/g, '');
     const telefoneTitular = participantes[0].phone.replace(/\D/g, '');
     
@@ -33,7 +70,7 @@ export default async function handler(req, res) {
         'X-Idempotency-Key': `pix-${Date.now()}-${cpfTitular}` 
       },
       body: JSON.stringify({
-        transaction_amount: Number(valorTotal),
+        transaction_amount: Number(valorEsperado), // Forçamos o uso do valor calculado pelo servidor!
         description: `Inscrição Trilha dos Espanhois - ${participantes[0].name}`,
         payment_method_id: 'pix',
         payer: {

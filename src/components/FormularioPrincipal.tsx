@@ -9,10 +9,14 @@ import PixModal from './PixModal';
 interface FormularioProps {
   vagasOcupadas: number;
   verificandoVagas: boolean;
-  LIMITE_VAGAS: number;
+  LIMITE_VAGAS?: number; // Deixei opcional para não dar erro caso o App.tsx ainda tente enviar esse dado
 }
 
-export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, LIMITE_VAGAS }: FormularioProps) {
+export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }: FormularioProps) {
+  
+  // 🔒 TRAVA DE VAGAS ATIVADA: O limite agora é estritamente 26!
+  const LIMITE_VAGAS = 26;
+
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -27,10 +31,11 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
 
   const taxaPix = 1;
   
+  // 💰 VALORES ATUALIZADOS: Matemática corrigida para R$ 110 e R$ 200
   const calcularValorIngressos = (qtd: number) => {
     const pares = Math.floor(qtd / 2); 
     const avulsos = qtd % 2;          
-    return (pares * 100) + (avulsos * 0.55);
+    return (pares * 200) + (avulsos * 110);
   };
 
   const [qrCodePix, setQrCodePix] = useState(''); 
@@ -41,8 +46,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
   const [participants, setParticipants] = useState([
     { name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '' }
   ]);
-
-  // ✨ REMOVIDO: O useEffect que travava o scroll (document.body.style.overflow = 'hidden') foi apagado!
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | undefined;
@@ -128,7 +131,7 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas, L
     if (loading) return;
 
     if (vagasOcupadas + participants.length > LIMITE_VAGAS) {
-      setErrorMsg(`Infelizmente não temos vagas suficientes disponíveis agora.`);
+      setErrorMsg(`Infelizmente não temos vagas suficientes disponíveis agora. Restam apenas ${LIMITE_VAGAS - vagasOcupadas} vaga(s).`);
       return;
     }
 

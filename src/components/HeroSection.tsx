@@ -88,7 +88,7 @@ export default function HeroSection({ vagasOcupadas, LIMITE_VAGAS, scrollToForm 
 
         {/* Localização */}
         <p className="text-slate-600 font-bold text-xs md:text-sm flex items-center justify-center gap-1.5 mb-6 tracking-wide">
-          <MapPin size={16} className="text-amber-600 shrink-0" /> Ruínas & Litoral • Suape / Cabo de Santo Agostinho - PE
+          <MapPin size={16} className="text-amber-600 shrink-0" /> Ruínas & Litoral • Gaibu (Vila Nazaré) - PE
         </p>
 
         {/* BLOCOS INFORMATIVOS SLIM (Estilo Litoral/Pedra) */}
@@ -105,12 +105,12 @@ export default function HeroSection({ vagasOcupadas, LIMITE_VAGAS, scrollToForm 
 
           <div className="flex items-center justify-center gap-2 bg-sky-50/90 text-sky-950 text-xs font-black py-2.5 px-4 rounded-xl border border-sky-200 shadow-sm uppercase tracking-widest backdrop-blur-md">
             <Footprints size={14} className="text-sky-600" />
-            <span>10km • Ritmo Moderado</span>
+            <span>11km • Ritmo Moderado</span>
           </div>
 
           <div className="flex items-center justify-center gap-2 bg-amber-50/90 text-amber-950 text-xs font-bold py-2.5 px-4 rounded-xl border border-amber-200 shadow-sm uppercase tracking-wider backdrop-blur-md">
             <Clock size={14} className="text-amber-600" />
-            <span>Saída às 06:30h</span>
+            <span>Saída às 05:00h (Derby)</span>
           </div>
         </motion.div>
 

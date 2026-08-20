@@ -1,10 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+// Usando as variáveis de ambiente com fallback para não quebrar na Vercel
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -15,12 +16,22 @@ const transporter = nodemailer.createTransport({
 });
 
 export default async function handler(req, res) {
+  // 🛡️ TRAVA: Prevenção de bloqueio de CORS (útil se você chamar via cron job ou botão no admin)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   try {
-    // 1. Busca inscrições não pagas, criadas há mais de 25 minutos e menos de 2 horas
+    // 1. Busca inscrições não pagas, criadas há mais de 25 minutos
     const tempoLimite = new Date(Date.now() - 25 * 60 * 1000).toISOString();
     
+    // CORREÇÃO: Apontando para a tabela 'participantes' da Trilha dos Espanhóis
     const { data: pendentes, error } = await supabase
-      .from('inscricao_trilha')
+      .from('participantes')
       .select('*')
       .eq('pago', false)
       .eq('lembrete_enviado', false)
@@ -40,12 +51,12 @@ export default async function handler(req, res) {
       const mailOptions = {
         from: `"Vem Para Trilha" <${process.env.EMAIL_USER}>`,
         to: inscrito.email,
-        subject: '⚠️ Sua vaga na Trilha Aldeia está esperando!',
+        subject: '⚠️ Sua vaga na Trilha dos Espanhóis está esperando!',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; padding: 20px;">
             <h2 style="color: #10b981;">Olá, ${inscrito.nome}!</h2>
-            <p>Vimos que você iniciou sua inscrição para a <strong>Trilha Aldeia</strong>, mas o PIX expirou antes da confirmação.</p>
-            <p>As vagas são limitadas e estão acabando rápido! Não queremos que você fique de fora dessa imersão na natureza.</p>
+            <p>Vimos que você iniciou sua inscrição para a <strong>Trilha dos Espanhóis</strong>, mas o PIX expirou antes da confirmação.</p>
+            <p>As vagas para o nosso transporte são restritas a apenas <strong>26 lugares</strong> e estão acabando rápido. Não queremos que você fique de fora dessa imersão na natureza e nas ruínas de Vila Nazaré!</p>
             
             <div style="text-align: center; margin: 30px 0;">
               <a href="${siteUrl}" style="background-color: #10b981; color: white; padding: 15px 25px; text-decoration: none; font-weight: bold; border-radius: 5px; text-transform: uppercase;">Garantir minha vaga agora</a>
@@ -59,17 +70,17 @@ export default async function handler(req, res) {
 
       await transporter.sendMail(mailOptions);
 
-      // 3. Marca no banco que o lembrete foi enviado
+      // 3. Marca no banco que o lembrete foi enviado na tabela correta
       await supabase
-        .from('inscricao_trilha')
+        .from('participantes')
         .update({ lembrete_enviado: true })
         .eq('id', inscrito.id);
     }
 
-    return res.status(200).json({ message: `${pendentes.length} e-mails de recuperação enviados!` });
+    return res.status(200).json({ message: `${pendentes.length} e-mails de recuperação enviados com sucesso!` });
 
   } catch (error) {
-    console.error("Erro na recuperação:", error);
-    return res.status(500).json({ error: 'Erro interno' });
+    console.error("Erro na recuperação do carrinho:", error);
+    return res.status(500).json({ error: 'Erro interno ao processar recuperação.' });
   }
 }

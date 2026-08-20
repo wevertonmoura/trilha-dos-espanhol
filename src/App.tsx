@@ -10,12 +10,13 @@ import Footer from './components/Footer';
 import FormularioPrincipal from './components/FormularioPrincipal'; 
 import { formatarMoeda } from './utils/helpers'; 
 
-const TrilhaAldeia = () => {
+const TrilhaEspanhois = () => {
   const [telaAdmin, setTelaAdmin] = useState<'nao' | 'login' | 'painel'>('nao');
   const [senhaAdmin, setSenhaAdmin] = useState('');
   const [erroLoginAdmin, setErroLoginAdmin] = useState('');
   
-  const LIMITE_VAGAS = 50;
+  // 🔒 NOVO LIMITE DE VAGAS ATUALIZADO
+  const LIMITE_VAGAS = 26;
   const [vagasOcupadas, setVagasOcupadas] = useState(0);
   const [verificandoVagas, setVerificandoVagas] = useState(true);
   
@@ -121,7 +122,7 @@ const TrilhaAldeia = () => {
         <div className="flex flex-col">
           <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Investimento</span>
           <div className="flex items-baseline gap-1">
-            <span className="text-xl font-black text-slate-900 tracking-tight">R$ 55</span>
+            <span className="text-xl font-black text-slate-900 tracking-tight">R$ 110</span>
             <span className="text-[10px] text-slate-500 font-medium">/ indiv.</span>
           </div>
         </div>
@@ -140,4 +141,4 @@ const TrilhaAldeia = () => {
   );
 };
 
-export default TrilhaAldeia;
+export default TrilhaEspanhois;

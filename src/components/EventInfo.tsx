@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Trophy, Clock, Mountain, Droplets, Info, Trash2, ShieldCheck, Waves, Maximize2, Ticket, VolumeX, QrCode, Coffee, Footprints, Sun, Compass, Sparkles, AlertTriangle } from 'lucide-react';
+import { Calendar, MapPin, Trophy, Clock, Mountain, Droplets, Info, Trash2, ShieldCheck, Waves, Maximize2, Ticket, VolumeX, QrCode, Coffee, Footprints, Sun, Compass, Sparkles, AlertTriangle, Bus, Medal } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const InfoRow = ({ icon, title, text, badge }: any) => (
@@ -31,7 +31,6 @@ interface EventInfoProps {
 
 export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
   return (
-    // ATUALIZAÇÃO SÊNIOR: Reduzido de space-y-20 para space-y-8 (diminui os buracos brancos!)
     <div className="lg:col-span-2 space-y-8 md:space-y-10 text-slate-800 relative">
       
       {/* ENFEITE: Luzes de fundo oceânicas e solares */}
@@ -64,7 +63,7 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
             Trilha dos <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-sky-700 to-amber-600 drop-shadow-sm">Espanhóis</span>
           </p>
           <p>
-            Uma experiência espetacular no litoral pernambucano. A equipe <span className="text-sky-600 font-black">Vem Para Trilha</span> convida você para uma manhã inesquecível unindo história colonial e natureza exuberante em <strong className="text-slate-900 font-bold">Suape, no Cabo de Santo Agostinho</strong>.
+            Uma experiência espetacular no litoral pernambucano. A equipe <span className="text-sky-600 font-black">Vem Para Trilha</span> convida você para uma manhã inesquecível unindo história colonial e natureza exuberante em <strong className="text-slate-900 font-bold">Gaibu (Vila Nazaré), no Cabo de Santo Agostinho</strong>.
           </p>
           <div className="bg-gradient-to-r from-sky-50 via-slate-50 to-amber-50/50 p-4 rounded-2xl border border-slate-200/80 shadow-inner flex items-start gap-3">
             <span className="text-2xl mt-0.5">🌿</span>
@@ -120,32 +119,44 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
           <InfoRow icon={<Calendar size={22} />} title="Data Oficial" text="16 de Agosto de 2026" badge="Domingo" />
-          <InfoRow icon={<Clock size={22} />} title="Horário de Saída" text="06:30 às 11:30" badge="Manhã" />
+          <InfoRow icon={<Clock size={22} />} title="Horário (Saída/Volta)" text="05:00 às 15:00" badge="Derby" />
           <a 
-            href="https://www.google.com/maps/search/?api=1&query=Ruinas+do+Forte+Cabo+de+Santo+Agostinho" 
+            href="https://www.google.com/maps/search/?api=1&query=Vila+Nazare+Cabo+de+Santo+Agostinho" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="block"
           >
-            <InfoRow icon={<MapPin className="animate-bounce" size={22} />} title="Localização (Clique p/ GPS)" text="Cabo de Santo Agostinho, PE" badge="Abrir GPS" />
+            <InfoRow icon={<MapPin className="animate-bounce" size={22} />} title="Localização (Clique p/ GPS)" text="Vila Nazaré, Gaibu" badge="Abrir GPS" />
           </a>
-          <InfoRow icon={<Footprints size={22} />} title="Nível do Percurso" text="10km • Ritmo Moderado" badge="Suape" />
+          <InfoRow icon={<Footprints size={22} />} title="Nível do Percurso" text="11km • Ritmo Moderado" badge="Gaibu" />
         </div>
 
         <div className="mt-5 pt-5 border-t border-slate-200/80 relative z-10">
-          <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-6 rounded-3xl border border-amber-300/80 flex items-center justify-between gap-4 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="p-3.5 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl shadow-md shrink-0">
-                <Trophy size={28} />
+          <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-6 rounded-3xl border border-amber-300/80 flex flex-col gap-4 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3.5 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-2xl shadow-md shrink-0">
+                  <Trophy size={28} />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase text-amber-800 tracking-widest bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200">Lote Único</span>
+                  <p className="text-slate-900 font-black text-xl md:text-2xl tracking-tight mt-1">R$ 110 Individual <span className="text-slate-400 font-normal">|</span> R$ 200 Casadinha</p>
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-black uppercase text-amber-800 tracking-widest bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200">Lote Promocional</span>
-                <p className="text-slate-900 font-black text-xl md:text-2xl tracking-tight mt-1">R$ 55 Individual <span className="text-slate-300 font-normal">|</span> R$ 100 Casadinha</p>
-              </div>
+              <span className="hidden sm:inline-block text-xs font-extrabold text-amber-900 bg-amber-200/60 px-3 py-1.5 rounded-xl border border-amber-300 shrink-0">
+                ⚡ Vagas Limitadas
+              </span>
             </div>
-            <span className="hidden sm:inline-block text-xs font-extrabold text-amber-900 bg-amber-200/60 px-3 py-1.5 rounded-xl border border-amber-300 shrink-0">
-              ⚡ Vagas Limitadas
-            </span>
+            
+            {/* NOVO BLOCO: O QUE ESTÁ INCLUSO */}
+            <div className="flex flex-wrap gap-2 mt-1">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-sky-800 bg-sky-100/80 px-2.5 py-1 rounded-lg border border-sky-200">
+                <Bus size={14} /> Transporte Incluso (Derby)
+              </span>
+              <span className="flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">
+                <Medal size={14} /> Medalha Inclusa
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -229,7 +240,7 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
                 <span>Investimento</span>
                 <span className="text-[9px] font-bold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">PIX</span>
               </h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-medium">R$ 55,00 (Individual) ou R$ 100,00 (Casadinha). Vagas estritamente limitadas.</p>
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">R$ 110,00 (Individual) ou R$ 200,00 (Casadinha). Vagas estritamente limitadas.</p>
             </div>
           </div>
 

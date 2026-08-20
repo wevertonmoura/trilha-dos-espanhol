@@ -7,15 +7,18 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   try {
+    // CORREÇÃO: Apontando para a tabela 'participantes', que é a mesma 
+    // usada no gerar-pix.js e no webhook.js!
     const { count, error } = await supabase
-      .from('inscricao_trilha')
+      .from('participantes')
       .select('*', { count: 'exact', head: true })
-      .eq('pago', true);
+      .eq('pago', true); // Conta apenas quem já teve o PIX aprovado
 
     if (error) throw error;
 
     res.status(200).json({ total: count || 0 });
   } catch (error) {
+    console.error("Erro na API checar-vagas:", error);
     res.status(500).json({ error: 'Erro ao buscar vagas' });
   }
 }

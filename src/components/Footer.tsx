@@ -56,10 +56,10 @@ export default function Footer() {
             
             <div className="text-slate-400 text-sm space-y-1.5 mt-1">
               <p className="flex items-center justify-center md:justify-start gap-2">
-                <MapPin size={16} className="text-sky-400 shrink-0"/> Cabo de Santo Agostinho - PE
+                <MapPin size={16} className="text-sky-400 shrink-0"/> Vila Nazaré, Gaibu - PE
               </p>
               <p className="flex items-center justify-center md:justify-start gap-2">
-                <Clock size={16} className="text-amber-500 shrink-0"/> Saída às 06:30h da manhã
+                <Clock size={16} className="text-amber-500 shrink-0"/> Saída às 05:00h da manhã (Derby)
               </p>
             </div>
           </div>
@@ -150,9 +150,9 @@ export default function Footer() {
               <div className="text-slate-600 text-sm space-y-4 leading-relaxed pr-2 font-medium">
                 {modalAberto === 'regulamento' ? (
                   <>
-                    <p><strong className="text-slate-900">1. DO EVENTO E PONTUALIDADE</strong><br/>A Trilha dos Espanhóis será realizada no Cabo de Santo Agostinho/Suape. A saída ocorrerá rigorosamente às <strong>06:30 da manhã</strong>. Tolerância de atraso zero para não prejudicar o planejamento e a segurança do grupo.</p>
+                    <p><strong className="text-slate-900">1. DO EVENTO E PONTUALIDADE</strong><br/>A Trilha dos Espanhóis será realizada em <strong>Gaibu (Vila Nazaré)</strong>. A saída ocorrerá rigorosamente às <strong>05:00 da manhã no Derby</strong>. Tolerância de atraso zero para não prejudicar o planejamento, o transporte e a segurança do grupo.</p>
                     
-                    <p><strong className="text-slate-900">2. CONDIÇÕES FÍSICAS E DE SAÚDE</strong><br/>Ao se inscrever, o participante declara estar em plenas condições de saúde física e mental para realizar o percurso de 10km, assumindo a responsabilidade sobre sua própria integridade.</p>
+                    <p><strong className="text-slate-900">2. CONDIÇÕES FÍSICAS E DE SAÚDE</strong><br/>Ao se inscrever, o participante declara estar em plenas condições de saúde física e mental para realizar o percurso de <strong>11km</strong>, assumindo a responsabilidade sobre sua própria integridade.</p>
                     
                     <p><strong className="text-slate-900">3. CLASSIFICAÇÃO ETÁRIA (A partir de 10 anos)</strong><br/>A idade mínima permitida para realizar o percurso é de <strong>10 anos completos</strong>. Por questões de segurança, todo menor de 18 anos deverá estar, obrigatoriamente, acompanhado por um responsável legal devidamente inscrito.</p>
                     
@@ -164,7 +164,7 @@ export default function Footer() {
                   <>
                     <p><strong className="text-slate-900">1. REGRA GERAL DE DESISTÊNCIA (Prazo de 7 dias)</strong><br/>Em conformidade com o Art. 49 do Código de Defesa do Consumidor, o participante tem o prazo de até 7 (sete) dias corridos <strong>após a data do pagamento</strong> para solicitar o cancelamento e obter o reembolso de 100% do valor.</p>
                     
-                    <p><strong className="text-slate-900">2. A "TRAVA" DA SEMANA DO EVENTO (Atenção Máxima)</strong><br/><strong className="text-red-600">Faltando 7 dias ou menos para a realização da trilha, NÃO HAVERÁ REEMBOLSO em nenhuma hipótese.</strong> Como a organização realiza a compra antecipada e personalizada de medalhas, pulseiras de identificação e insumos estruturais exatos por atleta, desistências na semana do evento não poderão ser estornadas.</p>
+                    <p><strong className="text-slate-900">2. A "TRAVA" DA SEMANA DO EVENTO (Atenção Máxima)</strong><br/><strong className="text-red-600">Faltando 7 dias ou menos para a realização da trilha, NÃO HAVERÁ REEMBOLSO em nenhuma hipótese.</strong> Como a organização realiza a compra antecipada e personalizada de medalhas, pulseiras de identificação, vagas no transporte e insumos estruturais exatos por atleta, desistências na semana do evento não poderão ser estornadas.</p>
                     
                     <p><strong className="text-slate-900">3. TRANSFERÊNCIA DE VAGA (Coloque um amigo no seu lugar)</strong><br/>Caso não possa comparecer e tenha perdido o prazo de estorno, sua vaga não está perdida! Você poderá repassá-la para outra pessoa de forma 100% gratuita. Basta notificar a organização pelo WhatsApp com até 24 horas de antecedência da saída, enviando nome, CPF e contato do novo titular.</p>
                     

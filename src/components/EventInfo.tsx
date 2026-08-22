@@ -118,7 +118,7 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-          <InfoRow icon={<Calendar size={22} />} title="Data Oficial" text="16 de Agosto de 2026" badge="Domingo" />
+          <InfoRow icon={<Calendar size={22} />} title="Data Oficial" text="27 de Setembro de 2026" badge="Domingo" />
           <InfoRow icon={<Clock size={22} />} title="Horário (Saída/Volta)" text="05:00 às 15:00" badge="Derby" />
           <a 
             href="https://www.google.com/maps/search/?api=1&query=Vila+Nazare+Cabo+de+Santo+Agostinho" 
@@ -218,21 +218,6 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 relative z-10">
-          
-          <div className="bg-gradient-to-r from-red-50 via-red-50/80 to-amber-50/50 p-6 rounded-3xl border-2 border-red-200 flex gap-4 col-span-1 md:col-span-2 shadow-sm hover:shadow-md transition-all">
-            <div className="p-3.5 bg-red-500 text-white rounded-2xl shrink-0 h-fit shadow-md">
-              <ShieldCheck size={28}/>
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h4 className="font-black text-red-950 uppercase text-sm tracking-widest">Acesso Restrito (Sem Penetra)</h4>
-                <span className="bg-red-200 text-red-900 font-extrabold text-[9px] px-2 py-0.5 rounded uppercase">Rigoroso</span>
-              </div>
-              <p className="text-xs md:text-sm text-red-900/90 leading-relaxed font-semibold">
-                A área do evento abrange trechos de <strong className="text-red-950 font-black underline decoration-red-400">propriedade privada e preservação</strong>. Somente participantes com pulseira e nome na lista poderão acompanhar o grupo.
-              </p>
-            </div>
-          </div>
 
           <div className="bg-slate-50/90 p-5 rounded-2xl border border-slate-200/80 shadow-sm flex gap-4 hover:bg-white hover:border-sky-300 hover:-translate-y-0.5 transition-all group">
             <div className="p-3 bg-sky-100 text-sky-700 rounded-xl shrink-0 h-fit group-hover:bg-sky-600 group-hover:text-white transition-colors shadow-sm"><Ticket size={24}/></div>

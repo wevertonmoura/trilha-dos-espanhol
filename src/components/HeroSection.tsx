@@ -83,7 +83,7 @@ export default function HeroSection({ scrollToForm }: HeroProps) {
         >
           <div className="flex items-center justify-center gap-2 bg-white/95 text-slate-800 text-xs font-bold py-2.5 px-4 rounded-xl border border-slate-200 shadow-sm uppercase tracking-wider backdrop-blur-md">
             <Calendar size={14} className="text-sky-600" />
-            <span>16 de Agosto, 2026</span>
+            <span>27 de Setembro, 2026</span>
           </div>
 
           <div className="flex items-center justify-center gap-2 bg-sky-50/90 text-sky-950 text-xs font-black py-2.5 px-4 rounded-xl border border-sky-200 shadow-sm uppercase tracking-widest backdrop-blur-md">

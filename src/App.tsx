@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Lock, ArrowLeft, ChevronRight, Medal, Bus, Map, Mountain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -45,13 +45,17 @@ const TrilhaEspanhois = () => {
   const [senhaAdmin, setSenhaAdmin] = useState('');
   const [erroLoginAdmin, setErroLoginAdmin] = useState('');
   
-  // 🔒 NOVO LIMITE DE VAGAS ATUALIZADO
+  // 🔒 LIMITE DE VAGAS
   const LIMITE_VAGAS = 26;
   const [vagasOcupadas, setVagasOcupadas] = useState(0);
   const [verificandoVagas, setVerificandoVagas] = useState(true);
   
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
   const images = ["/foto1.jpg", "/foto2.jpg", "/foto3.jpg", "/foto4.jpg"];
+
+  // 🔥 NOVO: Inteligência que esconde o rodapé e vigia a rolagem
+  const [mostrarRodape, setMostrarRodape] = useState(true);
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchVagas = async () => {
@@ -69,11 +73,30 @@ const TrilhaEspanhois = () => {
   }, []);
 
   useEffect(() => {
-    // O ADMIN JÁ ESTÁ ESCONDIDO! Só acessa quem digitar "?admin=true" no link.
+    // O ADMIN JÁ ESTÁ ESCONDIDO!
     const params = new URLSearchParams(window.location.search);
     if (params.get('admin') === 'true') {
       setTelaAdmin('login'); 
     }
+  }, []);
+
+  // 🔥 NOVO: Checagem de rolagem da tela
+  useEffect(() => {
+    const handleScroll = () => {
+      if (formRef.current) {
+        const rect = formRef.current.getBoundingClientRect();
+        // Se a pessoa desceu a tela até o formulário, o rodapé chiclete some
+        if (rect.top <= window.innerHeight) {
+          setMostrarRodape(false);
+        } else {
+          setMostrarRodape(true);
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Checa na primeira vez que abre
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLoginAdmin = async (e: React.FormEvent) => {
@@ -92,10 +115,11 @@ const TrilhaEspanhois = () => {
 
   const scrollToForm = (e: React.MouseEvent) => {
     e.preventDefault();
-    document.getElementById('inscricao')?.scrollIntoView({ behavior: 'smooth' });
+    setMostrarRodape(false); // 🔥 Esconde na mesma hora que clica
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // TELA DO COFRE ADMIN (Mantida escura para sensação de segurança e sigilo)
+  // TELA DO COFRE ADMIN
   if (telaAdmin === 'login') {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -136,7 +160,6 @@ const TrilhaEspanhois = () => {
         )}
       </AnimatePresence>
 
-      {/* CORREÇÃO AQUI: As variáveis antigas foram removidas do HeroSection! */}
       <HeroSection scrollToForm={scrollToForm} images={images} />
 
       <main className="container mx-auto px-4 md:px-6 py-12 max-w-5xl">
@@ -145,30 +168,41 @@ const TrilhaEspanhois = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           <EventInfo images={images} setSelectedImg={setSelectedImg} />
-          <div className="lg:col-span-1 mt-10 lg:mt-0">
+          
+          {/* 🔥 NOVO: Adicionado id="inscricao", ref={formRef} e min-h-[800px] para segurar o layout */}
+          <div className="lg:col-span-1 mt-10 lg:mt-0 min-h-[800px]" id="inscricao" ref={formRef}>
             <FormularioPrincipal vagasOcupadas={vagasOcupadas} verificandoVagas={verificandoVagas} LIMITE_VAGAS={LIMITE_VAGAS} />
           </div>
         </div>
       </main>
 
-      {/* BOTÃO CHICLETE GLOBAL (RODAPÉ MOBILE) COM PREÇO ATUALIZADO */}
-      <div className="fixed bottom-0 left-0 w-full bg-white/95 border-t border-slate-200 px-5 py-3.5 z-40 md:hidden flex items-center justify-between backdrop-blur-lg shadow-[0_-10px_25px_rgba(0,0,0,0.08)]">
-        <div className="flex flex-col">
-          <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Investimento</span>
-          <div className="flex items-baseline gap-1">
-            <span className="text-[10px] text-slate-500 font-medium mr-1">A partir de</span>
-            <span className="text-xl font-black text-slate-900 tracking-tight">R$ 75</span>
-          </div>
-        </div>
-        <a 
-          href="#inscricao"
-          onClick={scrollToForm}
-          className="bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 text-white font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl shadow-[0_5px_15px_rgba(2,132,199,0.35)] flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
-        >
-          <span>Garantir Vaga</span>
-          <ChevronRight size={16} />
-        </a>
-      </div>
+      {/* 🔥 NOVO: Rodapé animado que some sozinho */}
+      <AnimatePresence>
+        {mostrarRodape && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-0 left-0 w-full bg-white/95 border-t border-slate-200 px-5 py-3.5 z-40 md:hidden flex items-center justify-between backdrop-blur-lg shadow-[0_-10px_25px_rgba(0,0,0,0.08)]"
+          >
+            <div className="flex flex-col">
+              <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Investimento</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-[10px] text-slate-500 font-medium mr-1">A partir de</span>
+                <span className="text-xl font-black text-slate-900 tracking-tight">R$ 75</span>
+              </div>
+            </div>
+            <button 
+              onClick={scrollToForm}
+              className="bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 text-white font-black text-xs uppercase tracking-widest py-3 px-6 rounded-xl shadow-[0_5px_15px_rgba(2,132,199,0.35)] flex items-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+            >
+              <span>Garantir Vaga</span>
+              <ChevronRight size={16} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>

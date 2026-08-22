@@ -2,13 +2,11 @@ import React from 'react';
 import { ChevronRight, Calendar, Footprints, Clock, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Tirei as variáveis inúteis daqui da Interface
 interface HeroProps {
   scrollToForm: (e: React.MouseEvent) => void;
   images: string[];
 }
 
-// Tirei elas da função principal também
 export default function HeroSection({ scrollToForm }: HeroProps) {
   return (
     <section className="relative min-h-[78vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-sky-100 via-sky-50 to-amber-50/60 pt-12 pb-14 px-4">

@@ -100,17 +100,15 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     finally { setExcluindoId(null); }
   };
 
-  // --- Acionamentos de WhatsApp Turbinados (Com Inteligência de Casadinha) ---
+  // --- Acionamentos de WhatsApp Turbinados ---
   const chamarNoWhatsApp = (telefone: string, nome: string, pago: boolean) => {
     let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     if (numeroFormatado.length === 10 || numeroFormatado.length === 11) numeroFormatado = '55' + numeroFormatado;
     
-    // 1. Busca o participante clicado na memória para descobrir o código do Pix dele
     const participanteClicado = adminData.find(p => p.telefone === telefone && p.nome === nome);
     let nomesParaMensagem = (nome || '').split(' ')[0];
     let isPlural = false;
 
-    // 2. Se achar o Pix dele, vasculha quem mais pagou junto no mesmo Pix
     if (participanteClicado && participanteClicado.payment_id) {
       const grupoDoPix = adminData.filter(p => p.payment_id === participanteClicado.payment_id);
       const primeirosNomes = grupoDoPix.map(p => p.nome.split(' ')[0]);
@@ -120,7 +118,6 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
         if (primeirosNomes.length === 2) {
           nomesParaMensagem = `${primeirosNomes[0]} e ${primeirosNomes[1]}`;
         } else {
-          // Se tiver 3 ou mais, coloca vírgulas e um "e" no final
           const ultimo = primeirosNomes.pop();
           nomesParaMensagem = `${primeirosNomes.join(', ')} e ${ultimo}`;
         }
@@ -130,10 +127,8 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     let texto = "";
 
     if (pago) {
-      // TEXTO COM PLURAL AUTOMÁTICO (PAGO) - ATUALIZADO
       texto = `Fala, ${nomesParaMensagem}! Aqui é da organização do Vem Para Trilha. Passando para agradecer pela ${isPlural ? 'inscrição de vocês' : 'sua inscrição'}! A ${isPlural ? 'compra de vocês' : 'sua compra'} para a Trilha dos Espanhóis foi CONFIRMADA com sucesso! ✅\n\nA nossa aventura já é no dia 16 de Agosto! ⛰️🔥\n\nQueria pedir um favor: mandem aqui o ${isPlural ? '@ do Instagram de vocês e umas fotos bem massas' : 'seu @ do Instagram e uma foto sua bem massa'} para a gente preparar a arte de presença confirmada, beleza?\n\nAh, só para avisar: na semana da trilha vamos criar um grupo oficial no WhatsApp com todo mundo que vai participar para passar a localização exata, ponto de encontro e os últimos detalhes! Nos vemos lá! 🎒💦`;
     } else {
-      // TEXTO COM PLURAL AUTOMÁTICO (PENDENTE) - ATUALIZADO
       texto = `Fala, ${nomesParaMensagem}! Vi que a ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} para a Trilha dos Espanhóis ficou pendente. Aconteceu algum erro na hora de gerar o Pix? Se precisarem de ajuda ou preferirem fazer a transferência pela chave normal, é só me dar um alô aqui! 🚀`;
     }
 
@@ -145,7 +140,6 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     if (numeroFormatado.length === 10 || numeroFormatado.length === 11) numeroFormatado = '55' + numeroFormatado;
     const primeiroNome = (nome || '').split(' ')[0]; 
-    // MENSAGEM DE RESGATE - ATUALIZADA
     const mensagem = encodeURIComponent(`Olá ${primeiroNome}! Aqui é da organização da Trilha dos Espanhóis. Surgiu uma vaga de desistência! Você ainda tem interesse em participar?`);
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
@@ -154,10 +148,34 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
   const exportarPlanilha = () => { /* Lógica futura */ };
   const exportarPlanilhaCompleta = () => { /* Lógica futura */ };
 
-  // Cálculos Financeiros (Somente da aba de inscritos oficiais) - ATUALIZADO (200 casadinha, 110 individual)
+  // Cálculos Financeiros (Somente da aba de inscritos oficiais)
   const totalPagos = adminData.filter(p => p.pago).length;
   const totalPendentes = adminData.length - totalPagos;
-  const arrecadado = (Math.floor(totalPagos / 2) * 200) + ((totalPagos % 2) * 110); 
+  
+  // 💰 Lógica Avançada de Arrecadação com Casadinha Dupla 💰
+  const calcularArrecadado = () => {
+    const pagamentosAgrupados: Record<string, { com: number, sem: number }> = {};
+    
+    adminData.filter(p => p.pago).forEach(p => {
+      const pixId = p.payment_id || `manual-${p.id}`; 
+      if (!pagamentosAgrupados[pixId]) pagamentosAgrupados[pixId] = { com: 0, sem: 0 };
+      
+      if (p.tipo_ingresso === 'sem_transporte') pagamentosAgrupados[pixId].sem += 1;
+      else pagamentosAgrupados[pixId].com += 1;
+    });
+
+    let total = 0;
+    Object.values(pagamentosAgrupados).forEach(grupo => {
+      // Matemática: Com Transporte
+      total += (Math.floor(grupo.com / 2) * 200) + ((grupo.com % 2) * 110);
+      // Matemática: Sem Transporte
+      total += (Math.floor(grupo.sem / 2) * 140) + ((grupo.sem % 2) * 75);
+    });
+
+    return total;
+  };
+
+  const arrecadado = calcularArrecadado();
   
   // Filtros de Busca independentes
   const inscritosFiltrados = adminData.filter(p => (p.nome || '').toLowerCase().includes(busca.toLowerCase()) || (p.telefone || '').includes(busca));

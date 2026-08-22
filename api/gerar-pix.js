@@ -12,35 +12,49 @@ export default async function handler(req, res) {
   }
 
   const { participantes, valorTotal, emailPrincipal, contatoEmergencia } = req.body;
-  const LIMITE_VAGAS = 26;
+  const LIMITE_VAGAS_TRANSPORTE = 26;
 
   try {
     // =====================================================================
-    // 🛡️ TRAVA 1: VERIFICAÇÃO DE VAGAS NO BACKEND (Contra Overbooking)
+    // 🛡️ TRAVA 1: VERIFICAÇÃO DE VAGAS NO TRANSPORTE (Inteligente)
     // =====================================================================
-    const { count, error: erroCount } = await supabase
-      .from('participantes')
-      .select('*', { count: 'exact', head: true })
-      .eq('pago', true); // Só conta quem efetivamente já pagou
+    const qtdComTransporte = participantes.filter(p => p.tipo === 'com_transporte').length;
 
-    if (erroCount) {
-      throw new Error('Erro ao checar limite de vagas no banco de dados.');
+    if (qtdComTransporte > 0) {
+      const { count, error: erroCount } = await supabase
+        .from('participantes')
+        .select('*', { count: 'exact', head: true })
+        .eq('pago', true)
+        .eq('tipo_ingresso', 'com_transporte'); 
+
+      if (erroCount) {
+        throw new Error('Erro ao checar limite de vagas no banco de dados.');
+      }
+
+      if (count + qtdComTransporte > LIMITE_VAGAS_TRANSPORTE) {
+        return res.status(400).json({ 
+          error: `Inscrição barrada: Temos apenas ${LIMITE_VAGAS_TRANSPORTE - count} vaga(s) no transporte! Ajuste sua compra.` 
+        });
+      }
     }
 
-    if (count + participantes.length > LIMITE_VAGAS) {
-      return res.status(400).json({ 
-        error: `Inscrição barrada: Limite de vagas excedido! Restam apenas ${LIMITE_VAGAS - count} vaga(s).` 
-      });
-    }
+    // =====================================================================
+    // 🛡️ TRAVA 2: VALIDAÇÃO DE PREÇO (Casadinha Dinâmica)
+    // =====================================================================
+    const qtdSemTransporte = participantes.filter(p => p.tipo === 'sem_transporte').length;
 
-    // =====================================================================
-    // 🛡️ TRAVA 2: VALIDAÇÃO DE PREÇO (Contra Fraude de Request)
-    // =====================================================================
-    const qtd = participantes.length;
-    const pares = Math.floor(qtd / 2);
-    const avulsos = qtd % 2;
-    // R$ 200 a casadinha, R$ 110 o individual + R$ 1 real de taxa do sistema
-    const valorEsperado = (pares * 200) + (avulsos * 110) + 1; 
+    // Matemática: Com Transporte
+    const paresCom = Math.floor(qtdComTransporte / 2);
+    const avulsosCom = qtdComTransporte % 2;
+    const valorCom = (paresCom * 200) + (avulsosCom * 110);
+
+    // Matemática: Sem Transporte
+    const paresSem = Math.floor(qtdSemTransporte / 2);
+    const avulsosSem = qtdSemTransporte % 2;
+    const valorSem = (paresSem * 140) + (avulsosSem * 75);
+
+    // Valor Total + R$ 1,00 de taxa
+    const valorEsperado = valorCom + valorSem + 1; 
 
     if (Number(valorTotal) !== valorEsperado) {
       return res.status(400).json({ 
@@ -49,19 +63,16 @@ export default async function handler(req, res) {
     }
 
     // =====================================================================
-    // GERAÇÃO DO PIX E INSERÇÃO DE DADOS (Fluxo Normal)
+    // GERAÇÃO DO PIX E INSERÇÃO DE DADOS
     // =====================================================================
     const cpfTitular = participantes[0].cpf.replace(/\D/g, '');
     const telefoneTitular = participantes[0].phone.replace(/\D/g, '');
-    
-    // Webhook dinâmico: lê o domínio do Vercel automaticamente
     const webhookUrl = `https://${req.headers.host}/api/webhook`;
 
     const payerName = participantes[0].name.trim().split(" ");
     const firstName = payerName[0];
     const lastName = payerName.length > 1 ? payerName.slice(1).join(" ") : "Participante";
     
-    // Geração do PIX no Mercado Pago
     const response = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
@@ -70,8 +81,8 @@ export default async function handler(req, res) {
         'X-Idempotency-Key': `pix-${Date.now()}-${cpfTitular}` 
       },
       body: JSON.stringify({
-        transaction_amount: Number(valorEsperado), // Forçamos o uso do valor calculado pelo servidor!
-        description: `Inscrição Trilha dos Espanhois - ${participantes[0].name}`,
+        transaction_amount: Number(valorEsperado), 
+        description: `Trilha dos Espanhois - ${participantes[0].name}`,
         payment_method_id: 'pix',
         payer: {
           email: emailPrincipal,
@@ -92,7 +103,6 @@ export default async function handler(req, res) {
 
     const idDoPagamento = mpData.id.toString();
 
-    // Mapeamento de dados para salvar no Supabase
     const dadosParaSalvar = participantes.map((p, index) => {
       const cpfLimpo = p.cpf ? p.cpf.replace(/\D/g, '') : null;
       
@@ -102,12 +112,12 @@ export default async function handler(req, res) {
         telefone: index === 0 ? telefoneTitular : (p.phone ? p.phone.replace(/\D/g, '') : telefoneTitular),
         cpf: index === 0 ? cpfLimpo : null, 
         contato_emergencia: contatoEmergencia || null,
+        tipo_ingresso: p.tipo || 'com_transporte', 
         pago: false,
         payment_id: idDoPagamento 
       };
     });
 
-    // Inserção na tabela 'participantes'
     const { error: erroInsert } = await supabase.from('participantes').insert(dadosParaSalvar);
     
     if (erroInsert) {

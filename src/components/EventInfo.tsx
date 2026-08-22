@@ -140,7 +140,8 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
                 </div>
                 <div>
                   <span className="text-[10px] font-black uppercase text-amber-800 tracking-widest bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200">Lote Único</span>
-                  <p className="text-slate-900 font-black text-xl md:text-2xl tracking-tight mt-1">R$ 110 Individual <span className="text-slate-400 font-normal">|</span> R$ 200 Casadinha</p>
+                  <p className="text-slate-900 font-black text-xl md:text-2xl tracking-tight mt-1">R$ 110 Com Transporte <span className="text-slate-400 font-normal">|</span> R$ 75 Sem Transporte</p>
+                  <p className="text-[10px] font-bold text-amber-700 mt-1 uppercase tracking-widest">🔥 Desconto especial comprando 2 ingressos (Casadinha)!</p>
                 </div>
               </div>
               <span className="hidden sm:inline-block text-xs font-extrabold text-amber-900 bg-amber-200/60 px-3 py-1.5 rounded-xl border border-amber-300 shrink-0">
@@ -151,7 +152,7 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
             {/* NOVO BLOCO: O QUE ESTÁ INCLUSO */}
             <div className="flex flex-wrap gap-2 mt-1">
               <span className="flex items-center gap-1.5 text-xs font-bold text-sky-800 bg-sky-100/80 px-2.5 py-1 rounded-lg border border-sky-200">
-                <Bus size={14} /> Transporte Incluso (Derby)
+                <Bus size={14} /> Transporte Opcional
               </span>
               <span className="flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">
                 <Medal size={14} /> Medalha Inclusa
@@ -240,7 +241,7 @@ export default function EventInfo({ images, setSelectedImg }: EventInfoProps) {
                 <span>Investimento</span>
                 <span className="text-[9px] font-bold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">PIX</span>
               </h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-medium">R$ 110,00 (Individual) ou R$ 200,00 (Casadinha). Vagas estritamente limitadas.</p>
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">Opções de R$ 110 (Com Transporte) e R$ 75 (Sem Transporte). Aproveite o desconto progressivo na compra de 2 ingressos (Casadinha)!</p>
             </div>
           </div>
 

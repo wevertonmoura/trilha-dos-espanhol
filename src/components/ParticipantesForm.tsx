@@ -10,6 +10,7 @@ interface Participante {
   cpf: string;
   emergencyName: string;
   emergencyPhone: string;
+  tipo: 'com_transporte' | 'sem_transporte';
 }
 
 interface ParticipantesFormProps {
@@ -24,7 +25,7 @@ interface ParticipantesFormProps {
   errorMsg: string;
   loading: boolean;
   handleSubmit: (e: React.FormEvent) => void;
-  calcularValorIngressos: (qtd: number) => number;
+  calcularValorIngressos: (participantes: Participante[]) => number;
   taxaPix: number;
   inputClass: string;
 }
@@ -45,12 +46,16 @@ export default function ParticipantesForm({
   taxaPix,
   inputClass
 }: ParticipantesFormProps) {
+  
+  // Verifica se ainda há vagas no transporte baseadas em quem já foi adicionado no formulário
+  const ocupandoTransporte = participants.filter(p => p.tipo === 'com_transporte').length;
+  const podeAdicionarComTransporte = vagasOcupadas + ocupandoTransporte < LIMITE_VAGAS;
+
   return (
     <>
       <div className="text-center mb-10 relative">
         <h2 className="text-4xl font-black uppercase italic tracking-tighter text-slate-900">INSCRIÇÃO</h2>
-        {/* CORREÇÃO AQUI: Atualizado para R$ 110 e R$ 200 */}
-        <p className="text-sky-600 text-sm font-extrabold mt-1 tracking-widest">R$ 110 INDIVIDUAL | R$ 200 CASADINHA</p>
+        <p className="text-sky-600 text-sm font-extrabold mt-1 tracking-widest">R$ 110 COM TRANSPORTE | R$ 75 SEM TRANSPORTE</p>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -68,6 +73,53 @@ export default function ParticipantesForm({
             </div>
 
             <div className="grid grid-cols-1 gap-5">
+              
+              {/* ESCOLHA DE INGRESSO */}
+              <div className="space-y-3 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <label className="text-[11px] font-black uppercase text-slate-800">Selecione o Tipo de Ingresso:</label>
+                
+                <div className="flex flex-col gap-3">
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${participant.tipo === 'com_transporte' ? 'border-sky-500 bg-sky-50' : 'border-slate-100 hover:border-sky-200'} ${!podeAdicionarComTransporte && participant.tipo !== 'com_transporte' ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <input 
+                      type="radio" 
+                      name={`tipo-${index}`} 
+                      checked={participant.tipo === 'com_transporte'} 
+                      onChange={() => podeAdicionarComTransporte && updateParticipant(index, 'tipo', 'com_transporte')}
+                      disabled={!podeAdicionarComTransporte && participant.tipo !== 'com_transporte'}
+                      className="w-4 h-4 accent-sky-600" 
+                    />
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">Com Transporte <span className="text-sky-600 font-black">- R$ 110</span></p>
+                      <p className="text-[10px] text-slate-500 font-medium leading-tight mt-0.5">
+                        {!podeAdicionarComTransporte && participant.tipo !== 'com_transporte' ? 'Vagas no transporte esgotadas.' : 'Saindo da Praça do Derby de van/ônibus.'}
+                      </p>
+                    </div>
+                  </label>
+
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${participant.tipo === 'sem_transporte' ? 'border-amber-500 bg-amber-50' : 'border-slate-100 hover:border-amber-200'}`}>
+                    <input 
+                      type="radio" 
+                      name={`tipo-${index}`} 
+                      checked={participant.tipo === 'sem_transporte'} 
+                      onChange={() => updateParticipant(index, 'tipo', 'sem_transporte')} 
+                      className="w-4 h-4 accent-amber-600" 
+                    />
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">Sem Transporte <span className="text-amber-600 font-black">- R$ 75</span></p>
+                    </div>
+                  </label>
+                </div>
+
+                {participant.tipo === 'sem_transporte' && (
+                  <div className="mt-2 bg-amber-100/50 border border-amber-200 p-3 rounded-lg flex gap-2 items-start">
+                    <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-amber-800 font-bold leading-relaxed">
+                      Atenção: Ao escolher esta opção, você é responsável por chegar ao ponto de encontro em Vila Nazaré no horário combinado (07:00). Tolerância máxima de 15 minutos.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Nome Completo</label>
                 <input type="text" value={participant.name} onChange={e => updateParticipant(index, 'name', e.target.value)} className={inputClass} placeholder="Ex: João Silva" />
@@ -106,20 +158,18 @@ export default function ParticipantesForm({
           </div>
         ))}
         
-        {vagasOcupadas + participants.length < LIMITE_VAGAS && (
-          <motion.button 
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            type="button" 
-            onClick={addParticipant} 
-            className="w-full py-4 px-6 bg-gradient-to-r from-sky-50 via-sky-100/50 to-sky-50 hover:from-sky-100 hover:to-sky-100 border-2 border-dashed border-sky-300 hover:border-sky-500 rounded-2xl text-sky-700 hover:text-sky-900 font-black transition-all flex items-center justify-center gap-3 uppercase text-xs tracking-wider shadow-sm group cursor-pointer"
-          >
-            <span className="w-6 h-6 rounded-full bg-sky-200/60 flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-colors">
-              <Plus size={16} />
-            </span>
-            <span>Adicionar Acompanhante (Casadinha)</span>
-          </motion.button>
-        )}
+        <motion.button 
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+          type="button" 
+          onClick={addParticipant} 
+          className="w-full py-4 px-6 bg-gradient-to-r from-sky-50 via-sky-100/50 to-sky-50 hover:from-sky-100 hover:to-sky-100 border-2 border-dashed border-sky-300 hover:border-sky-500 rounded-2xl text-sky-700 hover:text-sky-900 font-black transition-all flex items-center justify-center gap-3 uppercase text-xs tracking-wider shadow-sm group cursor-pointer"
+        >
+          <span className="w-6 h-6 rounded-full bg-sky-200/60 flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-colors">
+            <Plus size={16} />
+          </span>
+          <span>Adicionar Outro Participante</span>
+        </motion.button>
 
         <label className="flex items-start gap-3 pt-4 border-t border-slate-200 cursor-pointer group">
           <input type="checkbox" checked={termsAccepted} onChange={e => setTermsAccepted(e.target.checked)} className="mt-1 h-5 w-5 accent-sky-600 cursor-pointer rounded shrink-0 transition-all" />
@@ -134,7 +184,7 @@ export default function ParticipantesForm({
         {errorMsg && <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-[11px] font-bold flex items-center justify-center gap-2"><AlertCircle size={16}/> {errorMsg}</div>}
         
         <button disabled={loading} className="w-full bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-black py-5 rounded-2xl shadow-[0_10px_25px_rgba(2,132,199,0.3)] hover:shadow-[0_15px_30px_rgba(2,132,199,0.45)] transition-all uppercase tracking-widest flex items-center justify-center gap-3 text-sm mt-4 cursor-pointer">
-          {loading ? <Loader2 className="animate-spin text-white" /> : <>Finalizar Inscrição (R$ {formatarMoeda(calcularValorIngressos(participants.length) + taxaPix)}) <ChevronRight size={20} /></>}
+          {loading ? <Loader2 className="animate-spin text-white" /> : <>Finalizar Inscrição (R$ {formatarMoeda(calcularValorIngressos(participants) + taxaPix)}) <ChevronRight size={20} /></>}
         </button>
       </form>
     </>

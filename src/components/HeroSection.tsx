@@ -114,7 +114,7 @@ export default function HeroSection({ vagasOcupadas, LIMITE_VAGAS, scrollToForm 
           </div>
         </motion.div>
 
-        {/* BOTÃO DE GARANTIR INGRESSO */}
+        {/* BOTÃO DE GARANTIR INGRESSO (Sempre Verde/Azul e Atrativo!) */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -124,13 +124,9 @@ export default function HeroSection({ vagasOcupadas, LIMITE_VAGAS, scrollToForm 
           <a 
             href="#inscricao" 
             onClick={scrollToForm} 
-            className={`w-full inline-flex items-center justify-center gap-2 font-black py-4 px-6 rounded-xl shadow-xl transition-all duration-300 uppercase tracking-widest text-xs cursor-pointer border ${
-              vagasOcupadas >= LIMITE_VAGAS 
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 border-amber-400/50 text-zinc-950' 
-                : 'bg-gradient-to-r from-sky-600 to-sky-700 border-sky-400/50 text-white shadow-[0_10px_25px_rgba(2,132,199,0.35)] hover:shadow-[0_15px_30px_rgba(2,132,199,0.5)] hover:-translate-y-1'
-            }`}
+            className="w-full inline-flex items-center justify-center gap-2 font-black py-4 px-6 rounded-xl shadow-[0_10px_25px_rgba(2,132,199,0.35)] hover:shadow-[0_15px_30px_rgba(2,132,199,0.5)] hover:-translate-y-1 transition-all duration-300 uppercase tracking-widest text-xs cursor-pointer border bg-gradient-to-r from-sky-600 to-sky-700 border-sky-400/50 text-white"
           >
-            <span>{vagasOcupadas >= LIMITE_VAGAS ? 'Lista de Espera' : 'Garantir Ingresso'}</span>
+            <span>Ver Ingressos</span>
             <ChevronRight size={16} />
           </a>
         </motion.div>

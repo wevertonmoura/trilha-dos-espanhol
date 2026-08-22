@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, ArrowLeft, ChevronRight } from 'lucide-react';
+import { X, Lock, ArrowLeft, ChevronRight, Medal, Bus, Map, Mountain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // IMPORTAÇÕES
@@ -9,6 +9,36 @@ import EventInfo from './components/EventInfo';
 import Footer from './components/Footer';
 import FormularioPrincipal from './components/FormularioPrincipal'; 
 import { formatarMoeda } from './utils/helpers'; 
+
+// --- NOVO COMPONENTE: O QUE ESTÁ INCLUSO ---
+const OQueEstaIncluso = () => {
+  const beneficios = [
+    { icone: <Bus size={32} className="text-sky-600" />, titulo: "Transporte Opcional", desc: "Vá com a nossa van saindo da Praça do Derby ou vá por conta própria." },
+    { icone: <Medal size={32} className="text-sky-600" />, titulo: "Medalha Exclusiva", desc: "Conquista garantida para todos que concluírem o desafio." },
+    { icone: <Map size={32} className="text-sky-600" />, titulo: "Guia Experiente", desc: "Trilha guiada com equipe preparada para dar todo o suporte." },
+    { icone: <Mountain size={32} className="text-sky-600" />, titulo: "Paisagens Incríveis", desc: "Conexão total com a natureza e fotos inesquecíveis em Vila Nazaré." },
+  ];
+
+  return (
+    <div className="w-full mb-12 animate-in fade-in duration-700">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-black uppercase italic tracking-tighter text-slate-900">O Que Está Incluso?</h2>
+        <p className="text-sky-600 text-sm font-extrabold mt-1 tracking-widest uppercase">Tudo que você precisa para curtir a trilha</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {beneficios.map((item, index) => (
+          <div key={index} className="bg-white border border-slate-200 p-6 rounded-[2rem] shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center gap-3 group">
+            <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-sky-100 transition-all duration-300">
+              {item.icone}
+            </div>
+            <h3 className="text-[13px] font-black text-slate-800 uppercase tracking-wide mt-2">{item.titulo}</h3>
+            <p className="text-xs text-slate-500 font-medium leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const TrilhaEspanhois = () => {
   const [telaAdmin, setTelaAdmin] = useState<'nao' | 'login' | 'painel'>('nao');
@@ -39,6 +69,7 @@ const TrilhaEspanhois = () => {
   }, []);
 
   useEffect(() => {
+    // O ADMIN JÁ ESTÁ ESCONDIDO! Só acessa quem digitar "?admin=true" no link.
     const params = new URLSearchParams(window.location.search);
     if (params.get('admin') === 'true') {
       setTelaAdmin('login'); 
@@ -94,7 +125,6 @@ const TrilhaEspanhois = () => {
   if (telaAdmin === 'painel') return <Admin senha={senhaAdmin} formatarMoeda={formatarMoeda} fecharAdmin={() => setTelaAdmin('nao')} />;
 
   return (
-    // ATUALIZAÇÃO SÊNIOR: Fundo trocado de bg-zinc-950 (preto) para bg-slate-50 (clarinho)
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-sky-500 selection:text-white overflow-x-hidden">
       
       <AnimatePresence>
@@ -109,6 +139,10 @@ const TrilhaEspanhois = () => {
       <HeroSection vagasOcupadas={vagasOcupadas} LIMITE_VAGAS={LIMITE_VAGAS} scrollToForm={scrollToForm} images={images} />
 
       <main className="container mx-auto px-4 md:px-6 py-12 max-w-5xl">
+        
+        {/* A SEÇÃO NOVA ENTRA AQUI, BEM NO TOPO! */}
+        <OQueEstaIncluso />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           <EventInfo images={images} setSelectedImg={setSelectedImg} />
           <div className="lg:col-span-1 mt-10 lg:mt-0">
@@ -117,13 +151,13 @@ const TrilhaEspanhois = () => {
         </div>
       </main>
 
-      {/* BOTÃO CHICLETE GLOBAL (RODAPÉ MOBILE) - TEMA CLARO E OCEANO */}
+      {/* BOTÃO CHICLETE GLOBAL (RODAPÉ MOBILE) COM PREÇO ATUALIZADO */}
       <div className="fixed bottom-0 left-0 w-full bg-white/95 border-t border-slate-200 px-5 py-3.5 z-40 md:hidden flex items-center justify-between backdrop-blur-lg shadow-[0_-10px_25px_rgba(0,0,0,0.08)]">
         <div className="flex flex-col">
           <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Investimento</span>
           <div className="flex items-baseline gap-1">
-            <span className="text-xl font-black text-slate-900 tracking-tight">R$ 110</span>
-            <span className="text-[10px] text-slate-500 font-medium">/ indiv.</span>
+            <span className="text-[10px] text-slate-500 font-medium mr-1">A partir de</span>
+            <span className="text-xl font-black text-slate-900 tracking-tight">R$ 75</span>
           </div>
         </div>
         <a 

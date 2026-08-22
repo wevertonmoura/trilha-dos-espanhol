@@ -136,11 +136,11 @@ const TrilhaEspanhois = () => {
         )}
       </AnimatePresence>
 
-      <HeroSection vagasOcupadas={vagasOcupadas} LIMITE_VAGAS={LIMITE_VAGAS} scrollToForm={scrollToForm} images={images} />
+      {/* CORREÇÃO AQUI: As variáveis antigas foram removidas do HeroSection! */}
+      <HeroSection scrollToForm={scrollToForm} images={images} />
 
       <main className="container mx-auto px-4 md:px-6 py-12 max-w-5xl">
         
-        {/* A SEÇÃO NOVA ENTRA AQUI, BEM NO TOPO! */}
         <OQueEstaIncluso />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">

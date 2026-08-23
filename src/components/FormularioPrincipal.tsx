@@ -12,7 +12,6 @@ interface FormularioProps {
   LIMITE_VAGAS?: number;
 }
 
-// Interface atualizada com o tipo de ingresso
 interface Participante {
   name: string;
   email: string;
@@ -25,7 +24,6 @@ interface Participante {
 
 export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }: FormularioProps) {
   
-  // 🔒 TRAVA DE VAGAS APENAS PARA O TRANSPORTE!
   const LIMITE_VAGAS = 26;
 
   const [loading, setLoading] = useState(false);
@@ -42,17 +40,17 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
 
   const taxaPix = 1;
   
-  // 💰 MATEMÁTICA ATUALIZADA (OPÇÃO 3: CASADINHA PARA TUDO)
   const calcularValorIngressos = (listaParticipantes: Participante[]) => {
+    // 🧪 MODO TESTE DE 1 REAL: Descomente a linha abaixo para testar o PIX!
+    // return 1; 
+
     const qtdCom = listaParticipantes.filter(p => p.tipo === 'com_transporte').length;
     const qtdSem = listaParticipantes.filter(p => p.tipo === 'sem_transporte').length;
 
-    // Casadinha Com Transporte (R$ 200 o par, R$ 110 avulso)
     const paresCom = Math.floor(qtdCom / 2);
     const avulsosCom = qtdCom % 2;
     const valorCom = (paresCom * 200) + (avulsosCom * 110);
 
-    // Casadinha Sem Transporte (R$ 140 o par, R$ 75 avulso)
     const paresSem = Math.floor(qtdSem / 2);
     const avulsosSem = qtdSem % 2;
     const valorSem = (paresSem * 140) + (avulsosSem * 75);
@@ -65,7 +63,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
   const [copiado, setCopiado] = useState(false);
   const [tempoRestante, setTempoRestante] = useState(900); 
 
-  // Estado inicial já inclui o tipo de ingresso padrão
   const [participants, setParticipants] = useState<Participante[]>([
     { name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '', tipo: 'com_transporte' }
   ]);
@@ -108,7 +105,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
   };
 
   const addParticipant = () => {
-    // Agora o sistema não bloqueia totalmente de adicionar, pois a pessoa pode adicionar alguém "Sem Transporte"
     setParticipants([...participants, { name: '', email: '', phone: '', cpf: '', emergencyName: '', emergencyPhone: '', tipo: 'com_transporte' }]);
   };
 
@@ -150,7 +146,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
     e.preventDefault();
     if (loading) return;
 
-    // A trava de vagas no clique de comprar agora só barra quem pediu "Com Transporte"
     const ocupandoTransporte = participants.filter(p => p.tipo === 'com_transporte').length;
     
     if (vagasOcupadas + ocupandoTransporte > LIMITE_VAGAS) {
@@ -183,7 +178,6 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
       const mainEmergency = `${participants[0].emergencyName} - ${participants[0].emergencyPhone}`;
       const mainEmail = participants[0].email;
       
-      // Usa a nova matemática para cobrar!
       const valorTotal = Number((calcularValorIngressos(participants) + taxaPix).toFixed(2));
 
       const response = await fetch('/api/gerar-pix', {
@@ -206,6 +200,12 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
         setPaymentId(mpData.id); 
         setTelaAtual('pix');
         setTempoRestante(900); 
+        
+        // 🔥 A MÁGICA ACONTECE AQUI: Rola a tela suavemente para o topo do PIX!
+        setTimeout(() => {
+          document.getElementById('inscricao')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+
       } else {
         throw new Error("Erro ao gerar o PIX. Verifique a configuração.");
       }
@@ -230,20 +230,17 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
   const inputClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 font-bold text-sm outline-none transition-all duration-200 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 hover:border-slate-300 shadow-sm placeholder-slate-400";
 
   return (
-    <section id="inscricao" className="lg:sticky lg:top-8 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-[2.5rem] p-6 md:p-10 shadow-2xl text-slate-800">
+    <section id="inscricao" className="lg:sticky lg:top-8 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-[2.5rem] p-6 md:p-10 shadow-2xl text-slate-800 min-h-[850px] flex flex-col justify-start transition-all duration-500">
       
-      {/* ESTADO 1: VERIFICANDO VAGAS */}
       {verificandoVagas ? (
-        <div className="flex flex-col items-center justify-center py-20 opacity-50">
+        <div className="flex flex-col items-center justify-center py-20 opacity-50 flex-1">
           <Loader2 className="animate-spin text-sky-600 mb-4" size={40} />
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Verificando Vagas...</p>
         </div>
       ) : 
       
-      /* ESTADO 2: FORMULÁRIO NORMAL DE COMPRA */
       telaAtual === 'formulario' ? (
-        <>
-          {/* Se as vagas de transporte esgotarem, mostra a lista de espera mas NÃO BLOQUEIA O FORM! */}
+        <div className="animate-in fade-in duration-500">
           {vagasOcupadas >= LIMITE_VAGAS && (
             <div className="mb-10">
               <ListaEsperaCard 
@@ -279,24 +276,24 @@ export default function FormularioPrincipal({ vagasOcupadas, verificandoVagas }:
             taxaPix={taxaPix}
             inputClass={inputClass}
           />
-        </>
+        </div>
       ) : (
-        /* ESTADO 3: PAINEL DE PAGAMENTO PIX DIRETO NO FLUXO NORMAL */
-        <PixModal 
-          statusPagamento={statusPagamento}
-          participants={participants}
-          qrCodeImg={qrCodeImg}
-          qrCodePix={qrCodePix}
-          copiado={copiado}
-          copiarPix={copiarPix}
-          tempoRestante={tempoRestante}
-          formatarTempo={formatarTempo}
-          // Hack brilhante para não precisarmos alterar o arquivo PixModal.tsx!
-          calcularValorIngressos={() => calcularValorIngressos(participants)}
-          taxaPix={taxaPix}
-          setTelaAtual={setTelaAtual}
-          reiniciarCompra={reiniciarCompra}
-        />
+        <div className="animate-in fade-in zoom-in-95 duration-500 flex-1 flex flex-col justify-start pt-4">
+          <PixModal 
+            statusPagamento={statusPagamento}
+            participants={participants}
+            qrCodeImg={qrCodeImg}
+            qrCodePix={qrCodePix}
+            copiado={copiado}
+            copiarPix={copiarPix}
+            tempoRestante={tempoRestante}
+            formatarTempo={formatarTempo}
+            calcularValorIngressos={() => calcularValorIngressos(participants)}
+            taxaPix={taxaPix}
+            setTelaAtual={setTelaAtual}
+            reiniciarCompra={reiniciarCompra}
+          />
+        </div>
       )}
     </section>
   );

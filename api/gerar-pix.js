@@ -81,8 +81,8 @@ export default async function handler(req, res) {
         'X-Idempotency-Key': `pix-${Date.now()}-${cpfTitular}` 
       },
       body: JSON.stringify({
-        transaction_amount: 1.00,
-       // transaction_amount: Number(valorEsperado), 
+        
+        transaction_amount: Number(valorEsperado), 
         description: `Trilha dos Espanhois - ${participantes[0].name}`,
         payment_method_id: 'pix',
         payer: {

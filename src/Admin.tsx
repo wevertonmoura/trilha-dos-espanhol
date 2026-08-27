@@ -9,9 +9,22 @@ interface AdminProps {
   fecharAdmin: () => void;
 }
 
+// Interface para sabermos a estrutura do participante
+interface ParticipanteAdmin {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  cpf: string;
+  pago: boolean;
+  tipo_ingresso: 'com_transporte' | 'sem_transporte'; // ✅ Estrutura identificada
+  payment_id?: string;
+  created_at: string;
+}
+
 const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
-  // Dados Principais
-  const [adminData, setAdminData] = useState<any[]>([]);
+  // Dados Principais usando a interface
+  const [adminData, setAdminData] = useState<ParticipanteAdmin[]>([]);
   const [esperaData, setEsperaData] = useState<any[]>([]);
   
   // Controles de Tela
@@ -100,15 +113,17 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     finally { setExcluindoId(null); }
   };
 
-  // --- Acionamentos de WhatsApp Turbinados ---
+  // --- 🔥 Acionamentos de WhatsApp Turbinados e Diferenciados 🔥 ---
   const chamarNoWhatsApp = (telefone: string, nome: string, pago: boolean) => {
     let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     if (numeroFormatado.length === 10 || numeroFormatado.length === 11) numeroFormatado = '55' + numeroFormatado;
     
+    // Identificar o participante específico clicado para pegar o tipo de ingresso
     const participanteClicado = adminData.find(p => p.telefone === telefone && p.nome === nome);
     let nomesParaMensagem = (nome || '').split(' ')[0];
     let isPlural = false;
 
+    // Lógica original de agrupamento por PIX para o nome do cumprimento
     if (participanteClicado && participanteClicado.payment_id) {
       const grupoDoPix = adminData.filter(p => p.payment_id === participanteClicado.payment_id);
       const primeirosNomes = grupoDoPix.map(p => p.nome.split(' ')[0]);
@@ -124,14 +139,27 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
       }
     }
 
-    let texto = "";
+    // ✅ Identificar tipo de ingresso ✅
+    const eComTransporte = participanteClicado?.tipo_ingresso !== 'sem_transporte';
+    
+    // Começar a montar a mensagem base
+    let textoIntro = `Fala, ${nomesParaMensagem}! Aqui é da organização do Vem Para Trilha.\n\n`;
+    let textoLogística = eComTransporte ? 'COM TRANSPORTE inclusão, sairemos às 05:00 do Derby' : 'SEM TRANSPORTE (nos encontramos em Vila Nazaré-Gaibu às 07:00)';
+    let textoBase = "";
 
     if (pago) {
-      texto = `Fala, ${nomesParaMensagem}! Aqui é da organização do Vem Para Trilha. Passando para agradecer pela ${isPlural ? 'inscrição de vocês' : 'sua inscrição'}! A ${isPlural ? 'compra de vocês' : 'sua compra'} para a Trilha dos Espanhóis foi CONFIRMADA com sucesso! ✅\n\nA nossa aventura já é no dia 16 de Agosto! ⛰️🔥\n\nQueria pedir um favor: mandem aqui o ${isPlural ? '@ do Instagram de vocês e umas fotos bem massas' : 'seu @ do Instagram e uma foto sua bem massa'} para a gente preparar a arte de presença confirmada, beleza?\n\nAh, só para avisar: na semana da trilha vamos criar um grupo oficial no WhatsApp com todo mundo que vai participar para passar a localização exata, ponto de encontro e os últimos detalhes! Nos vemos lá! 🎒💦`;
+      textoBase = `A ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} (${textoLogística}) foi CONFIRMADA com sucesso! ✅⛰️🔥\n\nA nossa aventura já é no dia 16 de Agosto!\n\nMandem o ${isPlural ? '@ do Instagram de vocês e umas fotos bem massas' : 'seu @ do Instagram e uma foto sua bem massa'} para a gente preparar a arte de presença confirmada, beleza?\n\nAh, e na semana da trilha vamos criar o grupo oficial no WhatsApp! Nos vemos lá! 🎒💦`;
     } else {
-      texto = `Fala, ${nomesParaMensagem}! Vi que a ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} para a Trilha dos Espanhóis ficou pendente. Aconteceu algum erro na hora de gerar o Pix? Se precisarem de ajuda ou preferirem fazer a transferência pela chave normal, é só me dar um alô aqui! 🚀`;
+      textoBase = `Vi que a ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} para a Trilha dos Espanhóis ficou PENDENTE. O Pix deu erro na hora de gerar?\n\nLembrando que `;
+      if (eComTransporte) {
+        textoBase += `como sua opção foi COM TRANSPORTE e os lugares na van são super limitados, queria confirmar se você ainda quer segurar a vaga.`;
+      } else {
+        textoBase += `as inscrições SEM TRANSPORTE (indo por conta própria) continuam abertas! Queria confirmar se aconteceu algo com o Pix ou se ainda quer participar.`;
+      }
+      textoBase += ` Se precisarem de ajuda ou preferirem transferir direto pela chave normal, me deem um alô aqui! 🚀`;
     }
 
+    let texto = textoIntro + textoBase;
     const mensagem = encodeURIComponent(texto);
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
@@ -140,7 +168,7 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     let numeroFormatado = (telefone || '').replace(/\D/g, ''); 
     if (numeroFormatado.length === 10 || numeroFormatado.length === 11) numeroFormatado = '55' + numeroFormatado;
     const primeiroNome = (nome || '').split(' ')[0]; 
-    const mensagem = encodeURIComponent(`Olá ${primeiroNome}! Aqui é da organização da Trilha dos Espanhóis. Surgiu uma vaga de desistência! Você ainda tem interesse em participar?`);
+    const mensagem = encodeURIComponent(`Olá ${primeiroNome}! Aqui é da organização da Trilha dos Espanhóis. Surgiu uma vaga de desistência para a van! Você ainda tem interesse em participar?`);
     window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, '_blank');
   };
 

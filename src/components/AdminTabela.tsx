@@ -1,4 +1,4 @@
-import { Clock, Check, MessageCircle, Loader2, Trash2, Edit2, AlertCircle, Search } from 'lucide-react';
+import { Clock, Check, MessageCircle, Loader2, Trash2, Edit2, AlertCircle, Search, Bus, Footprints } from 'lucide-react';
 
 export default function AdminTabela({
   dadosFiltrados, editId, editData, setEditData, setEditId,
@@ -24,6 +24,7 @@ export default function AdminTabela({
           <tr>
             <th className="p-6 whitespace-nowrap">Participante & Doc</th>
             <th className="p-6 whitespace-nowrap">Contato</th>
+            <th className="p-6 whitespace-nowrap text-center">Pacote</th>
             <th className="p-6 whitespace-nowrap text-right">Status & Ações</th>
           </tr>
         </thead>
@@ -64,6 +65,22 @@ export default function AdminTabela({
                   SOS: <span className="text-zinc-400">{p.contato_emergencia || 'N/A'}</span>
                 </div>
               </td>
+              
+              {/* NOVA COLUNA: TIPO DE PACOTE */}
+              <td className="p-6 text-center">
+                {p.tipo_ingresso === 'sem_transporte' ? (
+                  <div className="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-500 shadow-sm">
+                    <Footprints size={14} />
+                    <span className="text-[10px] font-black tracking-widest uppercase mt-0.5">Sem Transporte</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 bg-sky-500/10 border border-sky-500/30 px-3 py-1.5 rounded-xl text-sky-400 shadow-sm">
+                    <Bus size={14} />
+                    <span className="text-[10px] font-black tracking-widest uppercase mt-0.5">Com Transporte</span>
+                  </div>
+                )}
+              </td>
+
               <td className="p-6 text-right">
                 <div className="flex items-center justify-end gap-3">
                   {!editId && (

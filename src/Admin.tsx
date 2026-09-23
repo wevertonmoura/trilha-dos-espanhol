@@ -17,7 +17,7 @@ interface ParticipanteAdmin {
   telefone: string;
   cpf: string;
   pago: boolean;
-  tipo_ingresso: 'com_transporte' | 'sem_transporte'; // ✅ Estrutura identificada
+  tipo_ingresso: 'com_transporte' | 'sem_transporte';
   payment_id?: string;
   created_at: string;
 }
@@ -148,7 +148,8 @@ const Admin = ({ senha, formatarMoeda, fecharAdmin }: AdminProps) => {
     let textoBase = "";
 
     if (pago) {
-      textoBase = `A ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} (${textoLogística}) foi CONFIRMADA com sucesso! ✅⛰️🔥\n\nA nossa aventura já é no dia 16 de Agosto!\n\nMandem o ${isPlural ? '@ do Instagram de vocês e umas fotos bem massas' : 'seu @ do Instagram e uma foto sua bem massa'} para a gente preparar a arte de presença confirmada, beleza?\n\nAh, e na semana da trilha vamos criar o grupo oficial no WhatsApp! Nos vemos lá! 🎒💦`;
+      // ✅ AQUI FOI ALTERADO O TEXTO COM O LINK DO GRUPO E O AVISO DE PENETRAS ✅
+      textoBase = `A ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} (${textoLogística}) foi CONFIRMADA com sucesso! ✅⛰️🔥\n\nPor favor, já clique no link abaixo para entrar no nosso grupo oficial do WhatsApp. É por lá que vamos passar todas as informações detalhadas sobre o ponto de encontro e os horários!\n\n👉 *Link do grupo:* https://chat.whatsapp.com/LNWmn2mYhvpG21pl2NAAGP\n\n⚠️ *Aviso importante:* Pedimos que não levem acompanhantes extras ("penetras") que não estão na lista oficial, pois nosso evento tem limite de vagas e controle rigoroso de segurança, beleza?\n\nQualquer dúvida é só falar. Nos vemos na trilha! 🎒💦`;
     } else {
       textoBase = `Vi que a ${isPlural ? 'inscrição de vocês' : 'sua inscrição'} para a Trilha dos Espanhóis ficou PENDENTE. O Pix deu erro na hora de gerar?\n\nLembrando que `;
       if (eComTransporte) {
